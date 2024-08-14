@@ -1,0 +1,120 @@
+  382  cd lecture2
+  383  cd ../..
+  384  cd USP_Lectures/
+  385  clear
+  386  pwd
+  387  ls
+  388  cd lecture2
+  389  ls
+  390  cd ..
+  391  cd ..
+  392  cd USP_Lectures/lecture2
+  393  clear
+  394  cd ..
+  395  cd ..
+  396  cd USP_Lectures/lecture2
+  397  cat animals.txt 
+  398  mkdir sub
+  399  rmdir sub
+  400  mkdir sub
+  401  ls
+  402  ls -l
+  403  ls
+  404  touch sub/file.txt
+  405  ls sub/
+  406  rmdir sub
+  407  sudo rmdir
+  408  sudo rmdir sub
+  409  clear
+  410  rm -r sub
+  411  mkdir sub
+  412  touch sub/file.txt
+  413  ls sub
+  414  rmdir sub
+  415  rm sub
+  416  rm -r sub
+  417  ls
+  418  mkdir sub
+  419  touch sub/file.txt
+  420  chmod 000 sub/file.txt
+  421  clear
+  422  ls
+  423  rm -r sub
+  424  mkdir sub
+  425  touch sub/file.txt
+  426  chmod 000 sub/file.txt
+  427  rm -rf sub
+  428  clear
+  429  pwd
+  430  ls
+  431  touch f{1..5}
+  432  chmod 664 *
+  433  clear
+  434  ls -l
+  435  chmod 241 f1
+  436  ls -l
+  437  chmod u-w,g-r,o-r,o+x f2
+  438  ls -l f2
+  439  chmod u=w,g=r,o=x f3
+  440  ls -l f3
+  441  clear
+  442  ls -l f4
+  443  chmod 444 f4
+  444  ls -l
+  445  chmod u=r,g=r,o=r f4
+  446  ls -l
+  447  chmod u-w,g-w f5
+  448  ls -l
+  449  chmod a=r f1
+  450  ls -l
+  451  chmod u+wx f2
+  452  ls -l
+  453  cd ..
+  454  ls -l
+  455  cd lecture2
+  456  chmod a=4 f2
+  457  cd ..
+  458  ls lecture2
+  459  cd ..
+  460  clear
+  461  ls
+  462  cd USP_Lectures
+  463  ls
+  464  ls -l
+  465  chmod 444 lecture1
+  466  ls -l
+  467  ls -l lecture1
+  468  cd ..
+  469  chmod 774 lecture1
+  470  pwd
+  471  cd USP_Lectures
+  472  chmod 774 lecture1
+  473  ls -l
+  474  chmod 775 lecture1
+  475  ls -l
+  476  cd lecture2
+  477  ls -l
+  478  chmod 000 f?
+  479  ls -l
+  480  chmod 664 f?
+  481  ls
+  482  ls -l
+  483  rm f?
+  484  ls
+  485  cd ~/
+  486  find . -name "animals.txt"
+  487  ls -R 
+  488  clear
+  489  nano welcome.sh
+  490  chmod u+x welcome.sh 
+  491  ls -l
+  492  ./welcome.sh 
+  493  cat welcome.sh 
+  494  history
+  495  cd /d
+  496  cd d
+  497  cd d/
+  498  pwd
+  499  ls
+  500  history > lecture2.txt
+
