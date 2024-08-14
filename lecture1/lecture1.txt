@@ -1,0 +1,48 @@
+    1  clear
+    2  history
+    3  ls
+    4  pwd
+    5  mkdir sub2
+    6  ls
+    7  ls -l
+    8  ls -la
+    9  clear
+   10  ls
+   11  cd sub1
+   12  cd ..
+   13  pwd
+   14  touch file2.txt
+   15  clear
+   16  nano file3
+   17  ls
+   18  touch f1..5
+   19  ls
+   20  touch f[1..5]
+   21  ls
+   22  touch f1..f5
+   23  ls
+   24  touch f{1..5}
+   25  ls
+   26  rm other 
+   27  ls
+   28  cp file3.txt other
+   29  cp file3 other
+   30  ls
+   31  clear
+   32  ls
+   33  mv file3 newfile3
+   34  ls
+   35  mv other sub1
+   36  ls
+   37  ls sub1
+   38  clear
+   39  rmdir sub2
+   40  ls
+   41  rmdir sub1
+   42  rm -r sub1
+   43  ls
+   44  rm f*
+   45  ls
+   46  rm newfile3 
+   47  clear
+   48  history > lecture1.txt
