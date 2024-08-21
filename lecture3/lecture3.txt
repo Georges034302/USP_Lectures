@@ -1,0 +1,94 @@
+    1  history
+    2  clear
+    3  env
+    4  echo $PATH
+    5  echo $HOME
+    6  echo $RANDOM
+    7  clear
+    8  man ls
+    9  ls
+   10  touch f{1..4}
+   11  chmod 664 *
+   12  clear
+   13  ls -l
+   14  ls -l | tail -2
+   15  ls -l | head -3
+   16  ls -l
+   17  clear
+   18  ls -l
+   19  ls -l | tail -3
+   20  ls -l | tail -3 | head -2
+   21  ls -l | tail -3 | head -2 | wc
+   22  clear
+   23  ls -l
+   24  ls -l | head -1
+   25  ls -l | tail -n+2 
+   26  ls -l | tail -n+2 > file.txt
+   27  cat file.txt 
+   28  clear
+   29  ls -l 
+   30  ls -l | tail -n+2
+   31  ls -l | tail -n++1
+   32  ls -l | tail -n+1
+   33  clear
+   34  ls -l 
+   35  cat file.txt 
+   36  cat file.txt | tail -3
+   37  cat file.txt | tail -3 | head -2
+   38  cat file.txt | tail -3 | head -2 | nl
+   39  cat file.txt | tail -3 | head -2 | nl | wc
+   40  clear
+   41  cat file.txt;ls -l;whoami
+   42  cat file.txt && ls -l && whoami
+   43  catn file.txt && ls -l && whoami
+   44  catn file.txt;ls -l;whoami
+   45  catn file.txt && ls -l && whoamdhdsh
+   46  cat file2.txt && ls -l && whoami
+   47  clear
+   48  george=`ls -l`
+   49  echo $george
+   50  clear
+   51  ls -l | tail -n+2
+   52  alias myc='ls -l | tail -n+2'
+   53  myc
+   54  clear
+   55  nano ~/.bashrc
+   56  man sort
+   57  clear
+   58  ls
+   59  cat animals.txt 
+   60  cat animals.txt | sort
+   61  cat animals.txt | sort -f
+   62  cat animals.txt | sort --ignore-case
+   63  cat animals.txt | sort -f
+   64  cat animals.txt | sort -f -u
+   65  cat animals.txt | sort -f -u - r
+   66  cat animals.txt | sort -f -u -r
+   67  cat animals.txt | sort -fru
+   68  clear
+   69  cat animals.txt
+   70  cat animals.txt | sort -f
+   71  cat animals.txt | sort -fr
+   72  cat animals.txt | sort -fru
+   73  clear
+   74  cat animals.txt | sort -fru > animales2.txt
+   75  ls
+   76  sort animales.txt animals.txt 
+   77  sort animales2.txt animals.txt 
+   78* sort -u an
+   79  sort animales2.txt animals.txt -u
+   80  clear
+   81  sort animales2.txt animals.txt\
+   82  sort animales2.txt animals.txt
+   83  sort animales2.txt animals.txt
+   84  sort animales2.txt animals.txt
+   85  sort animales2.txt animals.txt -u
+   86  clear
+   87  n=4
+   88  echo $n
+   89  echo $PATH
+   90  clear
+   91  env
+   92  clear
+   93  nano check.sh
+   94  history > lecture3.txt
