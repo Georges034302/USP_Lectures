@@ -1,0 +1,6 @@
+-rw-rw-r--+ 1 George None 668 Aug 28 09:00 animals.txt
+-rw-rw-r--+ 1 George None 314 Jul 30 13:00 demo.txt
+-rw-rw-r--+ 1 George None  34 Aug 28 09:20 error.txt
+-rw-rw-r--+ 1 George None   1 Aug 28 09:23 file1.txt
+-rw-rw-r--+ 1 George None 118 Aug 28 09:16 file2.txt
+-rw-rw-r--+ 1 George None   0 Aug 28 09:28 out.txt
