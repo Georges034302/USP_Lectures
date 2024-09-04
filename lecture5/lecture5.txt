@@ -1,0 +1,85 @@
+    1  clear
+    2  grep 'grep' file
+    3  grep 'grep' file
+    4  grep 'grep' file
+    5  grep 'grep' file
+    6  clear
+    7  cd lecture4
+    8  clear
+    9  grep 'grep' demo.txt 
+   10  grep -i 'grep' demo.txt 
+   11  grep -in 'grep' demo.txt 
+   12  var=tutor
+   13  grep $var demo.txt 
+   14  grep -i $var demo.txt 
+   15  grep -wi $var demo.txt 
+   16  grep -win $var demo.txt 
+   17  clear
+   18  grep 'tutor' demo.txt 
+   19  grep -i 'tutor' demo.txt 
+   20  grep -wi 'tutor' demo.txt 
+   21  grep -i '\btutor\b demo.txt 
+   22  grep -i '\btutor\b' demo.txt 
+   23  grep -ni '\btutor\b' demo.txt 
+   24  grep -ni -A 3 '\btutor\b' demo.txt 
+   25  grep -ni -B 1 '\btutor\b' demo.txt 
+   26  grep -ni -C 1 '\btutor\b' demo.txt 
+   27  clear
+   28  grep '[0-9]' demo.txt 
+   29  grep '[0-9]{3,4}' demo.txt 
+   30  grep -E '[0-9]{3,4}' demo.txt 
+   31  grep -E '[A-Z]' demo.txt 
+   32  grep -E '[A-Z]{3,4}' demo.txt 
+   33  grep -E '[0-9]{3,4} | [A-Z]{3,4}' demo.txt 
+   34  grep -E '[0-9]{3,4}|[A-Z]{3,4}' demo.txt 
+   35  clear
+   36  grep -E '[0-9]{3,4}|[A-Z]{3,4}' demo.txt 
+   37  grep -e '[0-9]{3,4}' -e '[A-Z]{3,4}' demo.txt 
+   38  grep -eE '[0-9]{3,4}' -eE '[A-Z]{3,4}' demo.txt 
+   39  grep -E -e '[0-9]{3,4}' -e '[A-Z]{3,4}' demo.txt 
+   40  grep -E '#|$' demo.txt 
+   41  clear
+   42  grep -E '#|\$' demo.txt 
+   43  grep -e '#' -e '\$' demo.txt 
+   44  grep '[#$]' demo.txt 
+   45  grep '#' demo.txt | grep '\$'
+   46  grep '#.*$' demo.txt 
+   47  grep -E '#.*$' demo.txt 
+   48  grep -E '#.*\$' demo.txt 
+   49  grep -E '#+\$' demo.txt 
+   50  grep -E '#.+\$' demo.txt 
+   51  clear
+   52  grep '^' demo.txt 
+   53  grep '\^' demo.txt 
+   54  grep '^\^' demo.txt 
+   55  grep '\' demo.txt 
+   56  grep '\\' demo.txt 
+   57  clear
+   58  grep '^' demo.txt 
+   59  grep '\^' demo.txt 
+   60  grep '^\^' demo.txt 
+   61  clear
+   62  grep '#' demo.txt 
+   63* 
+   64  grep '\$' demo.txt 
+   65  cleart
+   66  clear
+   67  grep '\$' demo.txt 
+   68  grep '\$$' demo.txt 
+   69  grep -E '\$$' demo.txt 
+   70  grep -E ' $' demo.txt 
+   71  grep -E '\s$' demo.txt 
+   72  grep -E '( )$' demo.txt 
+   73  clear
+   74  grep '[A-Z]{3,4}' demo.txt 
+   75  grep -E '[A-Z]{3,4}' demo.txt 
+   76  cd ..
+   77  ls
+   78  cd ..
+   79  cd ..
+   80  grep -R 'echo' GitHub/
+   81  clear
+   82  cd GitHub/
+   83  grep -R 'echo' USP_Lectures/
+   84  grep -Rl 'echo' USP_Lectures/
+   85  history > lecture5.txt
