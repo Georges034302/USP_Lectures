@@ -1,0 +1,87 @@
+    1  clear
+    2  ls -l
+    3  touch f{1..5}
+    4  ls -l
+    5  chmod u-rw,u+x,g-r,o-r,o+w f1
+    6  ls -l f1
+    7  chmod u=x,g=w,o=w f2
+    8  ls -l f2
+    9  chmod 122 f3
+   10  ls -l
+   11  clear
+   12  ls -l
+   13  chmod chmod u=x,g=x,o=x f4
+   14  chmod u=x,g=x,o=x f4
+   15  ls -l f4
+   16  chmod a=x f5
+   17  ls -l f5
+   18  touch f6
+   19  clear
+   20  ls -l
+   21  chmod a=rwx f6
+   22  ls -l f6
+   23  touch f7
+   24  chmod a+rwx f7
+   25  ls -l
+   26  touch f8
+   27  cleart
+   28  clear
+   29  chmod 777 f8
+   30  ls -l
+   31  chmod 664 f[0-9]
+   32  ls -l
+   33  rm f[0-9]
+   34  ls
+   35  clear
+   36  ls
+   37  cat animals.txt 
+   38  clear
+   39  wc animals.txt 
+   40  wc -c animals.txt 
+   41  wc -w animals.txt 
+   42  wc -l animals.txt 
+   43  count=$(wc -w animals.txt)
+   44  echo count
+   45  echo $count
+   46  clear
+   47  sort animals.txt 
+   48  sort -f animals.txt 
+   49  clear
+   50  sort -f animals.txt 
+   51  sort -u -f animals.txt 
+   52  clear
+   53  sort -f animals.txt 
+   54  sort -f -r animals.txt 
+   55  sort -f -r -u animals.txt 
+   56  nano animals.txt 
+   57  clear
+   58  sort -r -f -u animals.txt 
+   59  sort -fru animals.txt 
+   60  clear
+   61  date
+   62  date "+%m/%d/%y"
+   63  date "+%m/%d/%Y"
+   64  date "+%m/%d/%Y - %H:%M"
+   65  date "+%A %d/%m/%Y"
+   66  date "+%A %d/%B/%Y"
+   67  clear
+   68  $RANDOM
+   69  echo $RANDOM
+   70  r=$(($RANDOM % 10))
+   71  echo $r
+   72  r=$(($RANDOM % 10))
+   73  echo $r
+   74  r=$(($RANDOM % 10))
+   75  echo $r
+   76  r=$(($RANDOM % 10))
+   77  echo $r
+   78  clear
+   79  whoami
+   80  test $(whoami) == "George" && echo "Hello" || echo "Bye"
+   81  test $(whoami) == "Georges" && echo "Hello" || echo "Bye"
+   82  test -f animals.txt && echo "This is a file"
+   83  mkdir sub
+   84  test -f sub && echo "This is a file"
+   85  test -f sub && echo "This is a file" || echo "This is a dir"
+   86  test -d sub && echo "This is a dir"
+   87  history > lecture3.txt
