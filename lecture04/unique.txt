@@ -1,0 +1,12 @@
+Boar
+Cat
+Dog
+Donkey
+Goat
+Horse
+Panda
+Panther
+Pig
+Sheep
+Wolf
+Zebra
