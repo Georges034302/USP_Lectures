@@ -1,0 +1,78 @@
+    1  clear
+    2  man grep
+    3  grep 'George' demo.txt 
+    4  grep -n 'George' demo.txt 
+    5  grep 'grep' demo.txt 
+    6  grep -n 'grep' demo.txt 
+    7  grep -ni 'grep' demo.txt 
+    8  clear 
+    9  grep 'Lecture' demo.txt 
+   10  grep -n 'Lecture' demo.txt 
+   11  grep -in 'Lecture' demo.txt 
+   12  grep -win 'Lecture' demo.txt 
+   13  grep -in 'Lecture' demo.txt 
+   14  grep -in '\bLecture\b' demo.txt 
+   15  grep -in "\bLecture\b" demo.txt 
+   16  clear
+   17  grep 'pattern' demo.txt 
+   18  grep -n 'pattern' demo.txt 
+   19  grep -n -B 1 'pattern' demo.txt 
+   20  grep -n -B 2 'pattern' demo.txt 
+   21  grep -n -B 3 'pattern' demo.txt 
+   22  grep -n -A 1 'pattern' demo.txt 
+   23  grep -n -A 4 'pattern' demo.txt 
+   24  clear
+   25  grep -n -B 10 'pattern' demo.txt 
+   26  grep -n -B 1 -A 1 'pattern' demo.txt 
+   27  grep -n -C 1 'pattern' demo.txt 
+   28  grep -n -C 2 'pattern' demo.txt 
+   29  clear
+   30  grep -n -C 1 'pattern' demo.txt 
+   31  grep -ni -C 1 'pattern' demo.txt 
+   32  clear
+   33  grep '\d' demo.txt 
+   34  grep '[0-9]' demo.txt 
+   35  clear
+   36  grep '[0-9]{2}' demo.txt 
+   37  grep -E '[0-9]{2}' demo.txt 
+   38  grep -E '[0-9][0-9]' demo.txt 
+   39  clear
+   40  grep -E '[0-9]{2}' demo.txt 
+   41  egrep '[0-9]{2}' demo.txt 
+   42  clear
+   43  egrep '[0-9]{4}' demo.txt 
+   44  grep -E '[0-9]{4}' demo.txt 
+   45  grep -E '[0-9]{2,4}' demo.txt 
+   46  grep '[A-Z]' demo.txt 
+   47  clear
+   48  grep -E '[A-Z]{4}' demo.txt 
+   49  grep '#' demo.txt 
+   50  clear
+   51  grep '^' demo.txt 
+   52  clear
+   53  grep '\^' demo.txt 
+   54  grep '\b^\b' demo.txt 
+   55  grep -E '\b^\b' demo.txt 
+   56  clear
+   57  grep '\^' demo.txt 
+   58  grep '^\^' demo.txt 
+   59  grep '\^$' demo.txt 
+   60  grep -E '\^$' demo.txt 
+   61  grep '$' demo.txt 
+   62  clear
+   63  grep '\$' demo.txt 
+   64  grep -E '\$$' demo.txt 
+   65  grep '\s$' demo.txt 
+   66  clear
+   67  grep '\' demo.txt 
+   68  grep '\\' demo.txt 
+   69  grep -E '#|:' demo.txt 
+   70  clear
+   71  grep -E '#|:' demo.txt 
+   72  grep '[#:]' demo.txt 
+   73  grep -e '#' -e ':' demo.txt 
+   74  clear
+   75  grep -E '^#|:' demo.txt 
+   76  grep -E '#.*:' demo.txt 
+   77  grep '#' demo.txt | grep ':' 
+   78  history > lecture05.txt
