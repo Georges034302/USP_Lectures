@@ -47,5 +47,6 @@ try:
 	print(total)
 except NameError:
 	print('total is deleted')
+	
 print('Thank you')
 
