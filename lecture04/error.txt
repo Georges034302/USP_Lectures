@@ -1,1 +1,0 @@
-cat: file2.txt: Permission denied
