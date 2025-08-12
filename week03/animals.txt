@@ -1,0 +1,10 @@
+elephant
+Dog
+cat
+DOG
+TIGER
+Elephant
+CAT
+cat
+tiger
+
