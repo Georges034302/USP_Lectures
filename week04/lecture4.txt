@@ -1,0 +1,156 @@
+    1  clear
+    2  ls
+    3  rm animals2.txt 
+    4  clear
+    5  ls -l
+    6  cat animals.txt 
+    7  cat animals.txt | head -3
+    8  cat animals.txt | head -3 | tail -2
+    9  cat animals.txt | headdslsgafdlk -3 | tail -2
+   10  clear
+   11  cat animals.txt | sort
+   12  cat animals.txt ; sort animals.txt 
+   13  catmmmmmmm animals.txt ; sort animals.txt 
+   14* catmmmmmmmm animals.txt | sort 
+   15  clear
+   16  catmmmmmmm animals.txt ; sort animals.txt 
+   17  catmmmmmmm animals.txt ; sort animals.txt | wc 
+   18  clear
+   19  cat animals.txt ; sort animals.txt 
+   20  cat animals.txt ; sort animals.txt | wc
+   21  clear
+   22  cat animals.txt ; sort animals.txt 
+   23  cat animals.txt | sort
+   24  cat animals.txt ; sort animals.txt 
+   25  cat animals.txt && sort animals.txt 
+   26  catlkkhjlhl animals.txt && sort animals.txt 
+   27  cat animals.txt && sort animals.txt 
+   28  clear
+   29  ls 
+   30  ls | sort
+   31  cat animals.txt 
+   32  cat animals.txt | head -4
+   33  clear
+   34  cat animals.txt | head -4
+   35  cat animals.txt ; head -4 animals.txt 
+   36  cat animals.txt && head -4 animals.txt 
+   37  catdfzfdgfd animals.txt && head -4 animals.txt 
+   38  catdfzfdgfd animals.txt ; head -4 animals.txt 
+   39  clear
+   40  wc animals.txt 
+   41  cat animals.txt 
+   42  cat animals.txt | wc
+   43  cat animals.txt | wc -l
+   44  cat animals.txt | wc -w
+   45  cat animals.txt | wc -c
+   46  clear
+   47  cat animals.txt 
+   48  catkutfgfjgcjygcfjhgfjhy animals.txt 
+   49  cat animals.txt 
+   50  clear
+   51  cat animals.txt 
+   52  cat < animals.txt 
+   53  cat 0< animals.txt 
+   54  clear
+   55  cat animals.txt | sort
+   56  cat animals.txt | sort > sorted.txt
+   57  ls
+   58  cat sorted.txt 
+   59  cat animals.txt | sort > sorted.txt
+   60  cat animals.txt 
+   61  cat sorted.txt 
+   62  clear
+   63  echo "animal list" sorted.txt 
+   64  echo "animal list" > sorted.txt 
+   65  cat sorted.txt 
+   66  echo "-- Animal List --" > sorted.txt 
+   67  cat sorted.txt 
+   68  cat animals.txt 
+   69  cat animals.txt | sort
+   70  cat animals.txt | sort >> sorted.txt 
+   71  clear
+   72  cat sorted.txt 
+   73  echo "-- Animal List --" > sorted.txt 
+   74  cat sorted.txt 
+   75  cat animals.txt | sort >> sorted.txt 
+   76  clear
+   77  ls
+   78  ls -l
+   79  chmod 000 sorted.txt 
+   80  cat animals.txt 
+   81  cat sorted.txt 
+   82  cat sorted.txt > error.txt
+   83  ls
+   84  cat error.txt 
+   85  cat sorted.txt 2> error.txt
+   86  cat error.txt 
+   87  ls -l
+   88  chmod 664 sorted.txt 
+   89  clear
+   90  cat sorted.txt 
+   91  cat animals.txt 
+   92  cat animals.txt | sort
+   93  cat animals.txt | sort > sorted.txt 
+   94  cat sorted.txt 
+   95  cat animals.txt | sort > sorted.txt 
+   96  cat sorted.txt 
+   97* cat sorted.txt 2> error.txt 
+   98  cat error.txt 
+   99  cat animals.txt | 2> file
+  100  ls
+  101  cat file 
+  102  rm file error.txt 
+  103  clear
+  104  ls
+  105  sort animals.txt 
+  106  sort -u animals.txt 
+  107  sort -ur animals.txt 
+  108  clear
+  109  cat animals.txt 
+  110  cat animals.txt | sort
+  111  cat animals.txt | sort -u
+  112  cat animals.txt 
+  113  cat animals.txt | uniq 
+  114  cat animals.txt | sort | uniq 
+  115  cat animals.txt | sort -u
+  116  clear
+  117  ls
+  118  cat animals.txt sorted.txt 
+  119  cat -2 animals.txt sorted.txt 
+  120  clear
+  121  paste animals.txt sorted.txt 
+  122  man paste
+  123  clear
+  124  cat sorted.txt 
+  125  pr animals.txt 
+  126  pr -t animals.txt 
+  127  pr -t -2 animals.txt 
+  128  pr -t -3 animals.txt 
+  129  pr -t -4 animals.txt 
+  130  pr -t -4 animals.txt > page.txt
+  131  clear
+  132  cat page.txt 
+  133  pr -t -4 animals.txt > page.txt
+  134  pr -t -4 animals.txt 
+  135  pr -4 animals.txt 
+  136  pr -t -4 animals.txt 
+  137  man pr
+  138  clear
+  139  ls -l
+  140  ls -l | tail -n+2
+  141  ls -l | tail -n+2 | cut -d " " -f 1
+  142  ls -l | tail -n+2 | cut -d " " -f 1,4
+  143  ls -l | tail -n+2 | cut -d " " -f 1-4
+  144  clear
+  145* ls -l | tail -n+2 | awk 
+  146  ls -l
+  147* ls -l | tail -n+2 
+  148  ls -l | tail -n+2 | cut -d " " -f 1-4
+  149  ls -l | tail -n+2 | cut -d " " -f 1
+  150  ls -l | tail -n+2 | cut -d " " -f 1,4
+  151  clear
+  152  ls -l | tail -n+2 | cut -d " " -f 1
+  153  ls -l | tail -n+2 | awk '{print $1}'
+  154  ls -l | tail -n+2 | awk '{print $1, $2}'
+  155  ls -l | tail -n+2 | awk '{print $1, $2, $4}'
+  156  history > lecture4.txt

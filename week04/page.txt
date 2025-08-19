@@ -1,0 +1,3 @@
+Tiger		  DOG		    TIGER	      dog
+cat		  dog		    CAT		      Lion
+tiger		  CAT		    cat		      tiger

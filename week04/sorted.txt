@@ -1,0 +1,12 @@
+cat
+cat
+CAT
+CAT
+dog
+dog
+DOG
+Lion
+tiger
+tiger
+Tiger
+TIGER
