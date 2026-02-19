@@ -1,0 +1,77 @@
+    1  ls
+    2  pwd
+    3  ls /
+    4  pwd
+    5  ls -l
+    6  man ls
+    7  man mkdir
+    8  mkdir dir1
+    9  ls
+   10  mkdir dir2 dir3 dir4
+   11  ls
+   12  mkdir parent/child/grandchild
+   13  mkdir -p parent/child/grandchild
+   14  ls
+   15  ls parent/
+   16  ls -R parent/
+   17  mkdirs
+   18  clear
+   19  ls -R parent/
+   20  pwd
+   21  ls /
+   22  tree
+   23  clear
+   24  mkdir week{1..9}
+   25  ls
+   26  mkdir dir{A..D}
+   27  ls
+   28  cd parent
+   29  pwd
+   30  ls child/
+   31  cd child/
+   32  pwd
+   33  d grandchild/
+   34  cd grandchild/
+   35  pwd
+   36  cd ..
+   37  pwd
+   38  cd ../..
+   39  pwd
+   40  cd parent/child/grandchild/
+   41  pwd
+   42  cd ~
+   43  cd cd /
+   44  cd /
+   45  clear
+   46  cd ~
+   47  pwd
+   48  cd parent/child/
+   49  cd ..
+   50  cd ..
+   51  cd /parent/child
+   52  ls /
+   53  cd /home/parent//child/
+   54  cd 
+   55  cd parent/child/
+   56  cd
+   57  pwd
+   58  rmdir dir1
+   59* rmdir dirdir2 dir3
+   60  rmdir parent/child/grandchild/
+   61  ls
+   62  ls parent/
+   63  ls parent/child/
+   64  rm -r parent/
+   65  ls
+   66  mkdir parent/child
+   67  mkdir -p parent/child
+   68  clear
+   69  ls parent/
+   70  rmdir parent/
+   71  ls parent/
+   72  rm -r parent/
+   73  ls
+   74  rmdir week[1-9]
+   75  rmdir dir?
+   76  history
+   77  history > lecture1.txt
