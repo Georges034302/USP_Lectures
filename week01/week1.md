@@ -115,7 +115,7 @@ To run Linux, you commonly use:
 - **Remote Linux environments** (e.g., university servers).
 - **Online terminal environments** (browser-based shells; limited persistence).
 - **Virtual machines (VMs)** on your own computer (Linux as a guest OS).
-- Later in the course context: **containers** (lightweight runtime environments).
+- **containers** (lightweight runtime environments).
 
 The key idea is that you should be able to operate Linux regardless of where it runs—local VM, remote server, or cloud-hosted environment.
 
