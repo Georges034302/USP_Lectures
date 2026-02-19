@@ -8,6 +8,7 @@
    2.3 [Evolution of Unix and Its Variants](#23-evolution-of-unix-and-its-variants)  
    2.4 [Linux as the Modern Unix Standard (Servers, Cloud, AI)](#24-linux-as-the-modern-unix-standard-servers-cloud-ai)  
    2.5 [Linux Distributions, Virtualization, and Access Methods](#25-linux-distributions-virtualization-and-access-methods)  
+   2.6 [Command Execution Workflow (Shell → Program → System Calls → Kernel → Hardware)](#26-command-execution-workflow-shell--program--system-calls--kernel--hardware)  
 3. [Starter Unix Commands](#3-starter-unix-commands)  
    3.1 [`man` — Manual Pages](#31-man--manual-pages)  
    3.2 [`pwd` — Print Working Directory](#32-pwd--print-working-directory)  
@@ -22,6 +23,7 @@
 By the end of Week 1, you should be able to:
 - Explain what *systems programming* means (and how it differs from application programming).
 - Describe Unix’s layered architecture (hardware → kernel → shell → user interfaces).
+- Explain the command execution workflow (shell → program → system calls → kernel → hardware).
 - Explain why Unix/Linux dominates modern servers, cloud platforms, and AI environments.
 - Navigate the filesystem and manage directories using a small set of essential commands.
 
@@ -52,17 +54,18 @@ Unix is often described using a layered (“onion”) model:
 
 - **Hardware / Devices**: physical components (CPU, disk, network, peripherals).
 - **Kernel**: the OS core that manages hardware and provides system services.
-- **Shell (CLI / interpreter)**: a program that accepts user commands and runs them.
+- **Shell (CLI / interpreter)**: a user-space program that interprets commands, launches programs, and communicates with the kernel through system calls.
 - **GUI (optional)**: graphical desktop environments layered above the OS.
 
 **Kernel (core idea):**
 - Runs with high privileges.
 - Manages processes, memory, filesystems, devices, and networking.
-- Exposes system services via system calls (the interface that programs rely on).
+- Exposes system services via **system calls** (the interface that programs rely on).
 
 **Shell (core idea):**
-- A command interpreter (e.g., `sh`, `bash`, `zsh`).
+- A command interpreter (e.g., `sh`, `bash`, `zsh`) running in user space.
 - Lets you run programs, combine tools, automate tasks, and write scripts.
+- Does **not** access hardware directly — it requests services from the kernel.
 
 **CLI vs GUI (core idea):**
 - **GUI** is convenient for one-off, visual tasks (clicking, dragging, browsing).
@@ -115,6 +118,74 @@ To run Linux, you commonly use:
 - Later in the course context: **containers** (lightweight runtime environments).
 
 The key idea is that you should be able to operate Linux regardless of where it runs—local VM, remote server, or cloud-hosted environment.
+
+---
+
+### 2.6 Command Execution Workflow (Shell → Program → System Calls → Kernel → Hardware)
+
+Understanding Unix architecture is incomplete unless you understand **how a command actually runs**.
+
+When you type a command such as:
+
+```bash
+ls
+```
+
+you are **not** “running it in the kernel”. You are running it in **user space**, and the program requests services from the kernel.
+
+#### Step-by-step workflow
+
+1. **User Input**  
+   You type `ls` at the shell prompt.
+
+2. **Shell Interpretation**  
+   The shell (e.g., `bash`) parses your input (command, arguments, redirection, pipes).
+
+3. **Program Location and Launch**  
+   The shell locates the executable (commonly `/bin/ls`) and starts it as a new process.
+
+4. **System Calls to Request OS Services**  
+   The `ls` program asks the kernel for directory data using system calls (e.g., open/read directory entries).
+
+5. **Kernel Handles the Request**  
+   The kernel coordinates drivers and subsystems (filesystem, disk, memory) to retrieve the information.
+
+6. **Result Returned to User Space**  
+   The kernel returns data to the `ls` process.
+
+7. **Output Displayed**  
+   `ls` prints results to the terminal (stdout), and you see the output.
+
+#### Architecture flow (workflow diagram)
+
+```
+User
+  ↓
+Shell (bash)
+  ↓
+Program (/bin/ls)
+  ↓
+System Calls
+  ↓
+Kernel
+  ↓
+Hardware (Disk, CPU, Memory, Network)
+```
+
+#### Key takeaways
+
+- The **shell** is a user-space program (CLI), not part of the kernel.
+- User programs do **not** access hardware directly.
+- The kernel provides **controlled access** to hardware resources and system services.
+- System calls are the controlled interface between user space and the kernel.
+
+#### Privilege separation (why you can’t “run CLI in the kernel”)
+
+Modern systems enforce separation between:
+- **Kernel mode (Ring 0)**: full hardware access (kernel code).
+- **User mode (Ring 3)**: restricted access (shell and applications).
+
+This separation improves **security**, **stability**, and **process isolation**.
 
 ---
 
