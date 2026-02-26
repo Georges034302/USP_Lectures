@@ -1,0 +1,98 @@
+    1  clear
+    2  touch f{1..9..3}
+    3  ls
+    4  ls -l
+    5  chmod u+x f1
+    6  ls -l
+    7  chmod u-x f1
+    8  ls -l
+    9  cat ~/.bashrc 
+   10  clear
+   11  ls
+   12  ls -l
+   13  chmod u-w,g-w f1
+   14  ls -l f1
+   15  chmod 444 f4
+   16  ls -l
+   17  chmod ugo=r f7
+   18  ls -l
+   19  chmod 664 f1 f4 f7
+   20  ls -l
+   21  clear
+   22  cd ../..
+   23  pwd
+   24  ls -R USP_Lectures/
+   25  tree -L 3 USP_Lectures/
+   26  clear
+   27  cd USP_Lectures/
+   28  cd week02
+   29  ls
+   30  mkdir dir{1..3}
+   31  ls
+   32  cp f1 dir1
+   33  ls
+   34  ls dir1
+   35  ls ~/
+   36  ls ~/ws
+   37  cp -R ~/ws .
+   38  ls
+   39  rm -r ws
+   40  ls
+   41  mv f1 file.txt
+   42  ls
+   43  mv file.txt dir1
+   44  ls
+   45  ls dir1
+   46  find dir1 -name file.txt
+   47  find ~/ -name file.txt
+   48  find ~/ -name demo.txt
+   49  ls
+   50  rm f7
+   51  rm dir1/file.txt 
+   52  ls
+   53  ls dir1
+   54  rm -r dir1
+   55  clear
+   56  touch f1 f2 fa fb faa f22
+   57  ls
+   58  cp f[0-9] dir2
+   59  ls dir2
+   60  cp f[a-z] dir3
+   61  ls dir3
+   62  touch f_ f#
+   63  ls
+   64  cp f? dir3
+   65  ls dir3
+   66  cp f?? dir2
+   67  ls dir2
+   68  mv f[0-9][0-9] dir3
+   69  ls dir3
+   70  ls
+   71  mv f[a-z][a-z] dir3
+   72  ls
+   73  rm f?
+   74  ls
+   75  rmdir dir[0-9]
+   76  rm -r dir[0-9]
+   77  ls
+   78  clear
+   79  ls
+   80  mkdir dir1 dirA
+   81  touch f2 f123asdrf fa
+   82  clear
+   83  ls
+   84  cp f? dir1
+   85  ls dir1
+   86  cp f* dir1
+   87  ls dir1
+   88  clear
+   89  ls
+   90  rm f?
+   91  ls
+   92  rm f123asdrf 
+   93  clear
+   94  ls
+   95  rm -r dir[A-Z]
+   96  ls
+   97  rm -r dir1
+   98  history > week2.txt
