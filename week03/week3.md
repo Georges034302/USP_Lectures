@@ -587,10 +587,13 @@ Common comparison operators:
 
 | Operator | Meaning |
 |---|---|
-| `=` | equal |
-| `!=` | not equal |
-| `-gt` | greater than |
-| `-lt` | less than |
+| `=` | strings are equal (POSIX `[ ]`) |
+| `==` | strings are equal (Bash `[[ ]]`) |
+| `!=` | strings are not equal |
+| `-gt` | greater than (numbers) |
+| `-lt` | less than (numbers) |
+| `-eq` | equal (numbers) |
+| `-ne` | not equal (numbers) |
 | `-f` | file exists |
 | `-d` | directory exists |
 
