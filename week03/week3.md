@@ -592,10 +592,16 @@ Common comparison operators:
 | `!=` | strings are not equal |
 | `-gt` | greater than (numbers) |
 | `-lt` | less than (numbers) |
+| `-ge` | greater than or equal (numbers) |
+| `-le` | less than or equal (numbers) |
 | `-eq` | equal (numbers) |
 | `-ne` | not equal (numbers) |
+| `>` | greater than (strings) |
+| `<` | less than (strings) |
 | `-f` | file exists |
 | `-d` | directory exists |
+
+**POSIX:** a Unix standard that defines portable shell behavior so scripts run consistently across different Unix systems.
 
 ---
 
