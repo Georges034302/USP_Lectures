@@ -1,4 +1,3 @@
-
 # USP Lectures
 
 Unix Systems Programming lecture materials and demos.
@@ -11,9 +10,10 @@ The material introduces Unix fundamentals, command-line tools, file systems, and
 
 # Lecture Structure
 
-## Week 01 — Introduction to Unix Systems Programming
+<details>
+<summary><strong>Week 01 — Introduction to Unix Systems Programming</strong></summary>
 
-Topics covered:
+### Topics covered
 
 - Overview of Unix Systems Programming
 - Operating system fundamentals
@@ -21,7 +21,7 @@ Topics covered:
 - Linux and Unix environments
 - Basic command-line navigation
 
-Commands introduced:
+### Commands introduced
 
 - `man`
 - `pwd`
@@ -29,11 +29,14 @@ Commands introduced:
 - `cd`
 - `rmdir`
 
+</details>
+
 ---
 
-## Week 02 — Filesystem and File Control
+<details>
+<summary><strong>Week 02 — Filesystem and File Control</strong></summary>
 
-Topics covered:
+### Topics covered
 
 - Unix filesystem structure
 - Absolute vs relative paths
@@ -41,7 +44,7 @@ Topics covered:
 - Ownership and groups
 - Managing files and directories
 
-Commands introduced:
+### Commands introduced
 
 - `touch`
 - `ls`
@@ -52,17 +55,20 @@ Commands introduced:
 - `tar`
 - `gzip`
 
-Concepts:
+### Concepts
 
 - File permissions
 - Ownership
 - Globbing patterns
 
+</details>
+
 ---
 
-## Week 03 — Text Processing and Bash Scripting
+<details>
+<summary><strong>Week 03 — Text Processing and Bash Scripting</strong></summary>
 
-Topics covered:
+### Topics covered
 
 - Processing text files with Unix tools
 - Viewing and inspecting files
@@ -71,7 +77,7 @@ Topics covered:
 - Conditional statements
 - Writing simple Bash scripts
 
-Commands introduced:
+### Commands introduced
 
 - `cat`
 - `less`
@@ -83,7 +89,7 @@ Commands introduced:
 - `echo`
 - `read`
 
-Concepts:
+### Concepts
 
 - Command chaining
 - Command substitution
@@ -91,25 +97,13 @@ Concepts:
 - PATH environment variable
 - Bash scripting basics
 
-Scripts included:
+### Scripts included
 
 - `preview_cities.sh`
 - `check_capital.sh`
 - `slice_cities.sh`
 
----
-
-# Repository Structure
-
-```
-USP_Lectures/
-│
-├── week01
-├── week02
-├── week03
-│
-├── README
-```
+</details>
 
 ---
 
