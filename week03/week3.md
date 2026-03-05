@@ -578,9 +578,9 @@ fi
 Examples:
 
 ```bash
-[ 5 -gt 3 ]
-[ "$CITY" = "Sydney" ]
-[ -f file.txt ]
+[ 5 -gt 3 ]                →  test 5 -gt 3
+[ "$CITY" = "Sydney" ]     →  test "$CITY" = "Sydney"
+[ -f file.txt ]            →  test -f file.txt
 ```
 
 Common comparison operators:
