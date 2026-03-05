@@ -104,10 +104,17 @@ Scripts included:
 ```
 USP_Lectures/
 │
-├── week01
-├── week02
-├── week03
-└── README
+├── week1.md
+├── week2.md
+├── week3.md
+│
+├── datasets/
+│   └── cities.txt
+│
+└── scripts/
+    ├── preview_cities.sh
+    ├── check_capital.sh
+    └── slice_cities.sh
 ```
 
 ---
