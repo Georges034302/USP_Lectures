@@ -117,4 +117,4 @@ To run the examples you need:
 
 ---
 
-## 👤 Author: *<sub><em>Georges Bou Ghantous</em></sub>*
+#### 👤 <sub><em>Author: *Georges Bou Ghantous</em></sub>*
