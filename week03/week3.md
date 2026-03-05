@@ -583,6 +583,18 @@ Examples:
 [ -f file.txt ]            →  test -f file.txt
 ```
 
+```bash
+test 5 -lt 3 && echo true || echo false
+
+**equivalent to:**
+
+[ 5 -lt 3 ] && echo true || echo false
+
+Explanation
+- && echo true → runs if the test is true
+- || echo false → runs if the test is false
+```
+
 Common comparison operators:
 
 | Operator | Meaning |
