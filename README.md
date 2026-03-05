@@ -117,6 +117,6 @@ To run the examples you need:
 
 ---
 
-# Subject
+## 👤 Author
 
-**32547 – Unix Systems Programming**
+*<sub><em>Georges Bou Ghantous</em></sub>*
