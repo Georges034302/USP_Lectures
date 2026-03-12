@@ -18,380 +18,548 @@
 
 ---
 
-## 1. Week 1 Overview
+# 1. Week 1 Overview
 
-By the end of Week 1, you should be able to:
-- Explain what *systems programming* means (and how it differs from application programming).
-- Describe Unix’s layered architecture (hardware → kernel → shell → user interfaces).
-- Explain the command execution workflow (shell → program → system calls → kernel → hardware).
-- Explain why Unix/Linux dominates modern servers, cloud platforms, and AI environments.
-- Navigate the filesystem and manage directories using a small set of essential commands.
+By the end of Week 1 you should be able to:
 
----
-
-## 2. Core Concepts
-
-### 2.1 Systems Programming and Operating System Foundations
-
-An **operating system (OS)** is the foundational software that makes a computer usable. It:
-- **Controls hardware** (CPU scheduling, memory management, device I/O).
-- **Provides services** to programs (files, processes, networking, security).
-- **Creates abstractions** so software doesn’t need to handle raw hardware details.
-
-**Systems programming** focuses on software that is *aware of OS features* and uses them deliberately. Typical concerns include:
-- **Processes and concurrency** (how programs start, run, communicate, and terminate).
-- **File and directory management** (permissions, paths, file descriptors, I/O).
-- **Resource control** (CPU, memory, storage, sockets).
-- **Security and access control** (users, groups, privileges).
-
-In contrast, **application programming** usually assumes the OS “just works” and does not require deep awareness of OS mechanisms.
+- Explain **what systems programming is**
+- Describe **Unix layered architecture**
+- Explain **how commands execute in Unix**
+- Understand **why Linux dominates servers and cloud**
+- Use basic **filesystem navigation commands**
 
 ---
 
-### 2.2 Unix Architecture: Kernel, Shell, and Interfaces (CLI vs GUI)
-
-Unix is often described using a layered (“onion”) model:
-
-- **Hardware / Devices**: physical components (CPU, disk, network, peripherals).
-- **Kernel**: the OS core that manages hardware and provides system services.
-- **Shell (CLI / interpreter)**: a user-space program that interprets commands, launches programs, and communicates with the kernel through system calls.
-- **GUI (optional)**: graphical desktop environments layered above the OS.
-
-**Kernel (core idea):**
-- Runs with high privileges.
-- Manages processes, memory, filesystems, devices, and networking.
-- Exposes system services via **system calls** (the interface that programs rely on).
-
-**Shell (core idea):**
-- A command interpreter (e.g., `sh`, `bash`, `zsh`) running in user space.
-- Lets you run programs, combine tools, automate tasks, and write scripts.
-- Does **not** access hardware directly — it requests services from the kernel.
-
-**CLI vs GUI (core idea):**
-- **GUI** is convenient for one-off, visual tasks (clicking, dragging, browsing).
-- **CLI** is powerful for repeated work, automation, remote administration, and reproducible workflows.
-- In DevOps and cloud operations, CLI usage becomes essential because automation and scripting are non-negotiable.
+# 2. Core Concepts
 
 ---
 
-### 2.3 Evolution of Unix and Its Variants
+## 2.1 Systems Programming and Operating System Foundations
 
-Unix is not a single “mono-brand” OS. Over time:
-- Multiple **Unix families and variants** emerged (commercial and community-driven).
-- Many different **shells** were created (`sh`, `csh`, `ksh`, `bash`, `zsh`, etc.).
-- Even when the command name is the same, behavior can differ between systems or shells.
+### Definition
 
-To reduce fragmentation, standards exist (e.g., the **Single UNIX Specification**), but real-world differences still appear—especially across older Unix systems and modern Linux environments.
+An **Operating System (OS)** is the software layer that manages hardware and provides services to programs.
 
-Key takeaway for this subject:
-- You focus on concepts that transfer across systems.
-- You also learn to confirm behavior using documentation (`man`) and experimentation.
+Its main responsibilities:
 
----
+- CPU scheduling
+- Memory management
+- File systems
+- Device drivers
+- Networking
+- Security
 
-### 2.4 Linux as the Modern Unix Standard (Servers, Cloud, AI)
+### Systems Programming
 
-Linux has become the practical standard Unix-like environment because it is:
-- **Free** to use and widely available.
-- **Open source**, enabling rapid fixes and community improvements.
-- **Highly portable**, running on servers, desktops, embedded devices, and cloud infrastructure.
+**Systems programming** means writing software that interacts closely with OS services.
 
-This is why Linux dominates:
-- **Servers and cloud** (most production workloads run on Linux).
-- **DevOps tooling** (CI/CD runners, containers, Kubernetes nodes).
-- **AI/ML platforms** (common base OS for GPU-enabled training and inference stacks).
+Examples include programs that use:
 
-In other words: learning Unix/Linux CLI skills is not “optional”—it’s foundational for modern software engineering and cloud operations.
+- processes
+- file descriptors
+- system calls
+- sockets
+- memory management
 
----
+### Comparison
 
-### 2.5 Linux Distributions, Virtualization, and Access Methods
+| Type | Focus |
+|---|---|
+| Application Programming | Builds user applications |
+| Systems Programming | Uses OS mechanisms directly |
 
-Linux is built around the **Linux kernel**, but what you use day-to-day is usually a **distribution (distro)**:
-- A distro packages the kernel with system tools, libraries, package managers, and (optionally) a desktop environment.
-- Examples: Debian-based (Ubuntu), Red Hat-based (Fedora), and many others.
+Examples:
 
-To run Linux, you commonly use:
-- **Remote Linux environments** (e.g., university servers).
-- **Online terminal environments** (browser-based shells; limited persistence).
-- **Virtual machines (VMs)** on your own computer (Linux as a guest OS).
-- **containers** (lightweight runtime environments).
-
-The key idea is that you should be able to operate Linux regardless of where it runs—local VM, remote server, or cloud-hosted environment.
+- Systems programs → `ls`, `cp`, `ssh`, `docker`
+- Applications → web apps, games, editors
 
 ---
 
-### 2.6 Command Execution Workflow (Shell → Program → System Calls → Kernel → Hardware)
+## 2.2 Unix Architecture: Kernel, Shell, and Interfaces (CLI vs GUI)
 
-Understanding Unix architecture is incomplete unless you understand **how a command actually runs**.
+Unix uses a **layered architecture**.
 
-When you type a command such as:
+### Architecture Diagram
 
-```bash
+```
++----------------------+
+|      User            |
++----------------------+
+          ↓
++----------------------+
+|   Shell (bash,zsh)   |
+|   Command Interpreter|
++----------------------+
+          ↓
++----------------------+
+|     System Calls     |
++----------------------+
+          ↓
++----------------------+
+|       Kernel         |
+| Process | Memory | IO|
++----------------------+
+          ↓
++----------------------+
+|       Hardware       |
+| CPU Disk Network GPU |
++----------------------+
+```
+
+### Kernel
+
+The **kernel** is the core of the OS.
+
+Responsibilities:
+
+- process scheduling
+- memory allocation
+- device communication
+- filesystem management
+- networking
+
+### Shell
+
+The **shell** is a command interpreter.
+
+Examples:
+
+- `bash`
+- `zsh`
+- `sh`
+- `fish`
+
+The shell:
+
+- reads commands
+- starts programs
+- manages environment variables
+- supports scripting
+
+### CLI vs GUI
+
+| Interface | Description |
+|---|---|
+| CLI | text commands |
+| GUI | graphical interface |
+
+CLI advantages:
+
+- automation
+- remote access
+- scripting
+- reproducibility
+
+---
+
+## 2.3 Evolution of Unix and Its Variants
+
+Unix began at **Bell Labs (1970s)**.
+
+Over time many variants emerged.
+
+### Unix Family Tree
+
+```
+Original Unix
+     ↓
+ BSD -------- System V
+     ↓             ↓
+ macOS          Solaris
+     ↓
+ Linux (Unix-like)
+```
+
+Modern Unix environments include:
+
+- Linux
+- macOS
+- FreeBSD
+- Solaris
+
+### Important shells developed
+
+| Shell | Description |
+|---|---|
+| sh | Bourne shell |
+| csh | C shell |
+| ksh | Korn shell |
+| bash | Bourne again shell |
+| zsh | modern extended shell |
+
+---
+
+## 2.4 Linux as the Modern Unix Standard (Servers, Cloud, AI)
+
+Linux dominates modern computing because it is:
+
+- open source
+- stable
+- scalable
+- highly portable
+
+### Where Linux dominates
+
+| Domain | Usage |
+|---|---|
+| Servers | majority of internet infrastructure |
+| Cloud | AWS, Azure, GCP |
+| Containers | Docker and Kubernetes |
+| AI | GPU training environments |
+
+Example:
+
+Most AI models are trained on **Linux GPU clusters**.
+
+---
+
+## 2.5 Linux Distributions, Virtualization, and Access Methods
+
+### Linux Distribution
+
+A **distribution (distro)** packages:
+
+- Linux kernel
+- system libraries
+- package manager
+- utilities
+
+Examples:
+
+| Distro | Type |
+|---|---|
+| Ubuntu | Debian-based |
+| Debian | stable server distro |
+| Fedora | RedHat family |
+| Arch | rolling release |
+
+### Running Linux
+
+Common methods:
+
+```
+Local machine
+    ↓
+Virtual Machine
+    ↓
+Remote SSH server
+    ↓
+Cloud instance
+```
+
+### Example VM tools
+
+- VirtualBox
+- VMware
+- Multipass
+- Docker containers
+
+---
+
+## 2.6 Command Execution Workflow (Shell → Program → System Calls → Kernel → Hardware)
+
+When you type a command:
+
+```
 ls
 ```
 
-you are **not** “running it in the kernel”. You are running it in **user space**, and the program requests services from the kernel.
+The system follows this sequence.
 
-#### Step-by-step workflow
-
-1. **User Input**  
-   You type `ls` at the shell prompt.
-
-2. **Shell Interpretation**  
-   The shell (e.g., `bash`) parses your input (command, arguments, redirection, pipes).
-
-3. **Program Location and Launch**  
-   The shell locates the executable (commonly `/bin/ls`) and starts it as a new process.
-
-4. **System Calls to Request OS Services**  
-   The `ls` program asks the kernel for directory data using system calls (e.g., open/read directory entries).
-
-5. **Kernel Handles the Request**  
-   The kernel coordinates drivers and subsystems (filesystem, disk, memory) to retrieve the information.
-
-6. **Result Returned to User Space**  
-   The kernel returns data to the `ls` process.
-
-7. **Output Displayed**  
-   `ls` prints results to the terminal (stdout), and you see the output.
-
-#### Architecture flow (workflow diagram)
+### Execution Flow
 
 ```
 User
-  ↓
+ ↓
 Shell (bash)
-  ↓
-Program (/bin/ls)
-  ↓
+ ↓
+Executable program (/bin/ls)
+ ↓
 System Calls
-  ↓
+ ↓
 Kernel
-  ↓
-Hardware (Disk, CPU, Memory, Network)
+ ↓
+Hardware
 ```
 
-#### Key takeaways
+### Step-by-step process
 
-- The **shell** is a user-space program (CLI), not part of the kernel.
-- User programs do **not** access hardware directly.
-- The kernel provides **controlled access** to hardware resources and system services.
-- System calls are the controlled interface between user space and the kernel.
+1. User enters command
+2. Shell parses command
+3. Shell finds executable
+4. Program starts as new process
+5. Program requests kernel services
+6. Kernel interacts with hardware
+7. Output returned to terminal
 
-#### Privilege separation (why you can’t “run CLI in the kernel”)
+### Example
 
-Modern systems enforce separation between:
-- **Kernel mode (Ring 0)**: full hardware access (kernel code).
-- **User mode (Ring 3)**: restricted access (shell and applications).
+```bash
+ls
+# request directory listing
+```
 
-This separation improves **security**, **stability**, and **process isolation**.
+Internally:
+
+```
+ls
+ ↓
+open directory
+ ↓
+read entries
+ ↓
+send output to terminal
+```
+
+### Privilege levels
+
+```
+User Mode
+  |
+  | system calls
+  v
+Kernel Mode
+```
+
+User programs **cannot access hardware directly**.
 
 ---
 
-## 3. Starter Unix Commands
+# 3. Starter Unix Commands
 
-This section introduces foundational commands used to navigate and manage directories.
+---
 
-### 3.1 `man` — Manual Pages
+## 3.1 `man` — Manual Pages
 
-**Purpose:** View official documentation for a command.
+### Definition
 
-**Basic syntax:**
+`man` displays the **manual page** for a command.
+
+### Syntax
+
 ```bash
-man command_name
+man command
 ```
 
-**Examples:**
+### Common usage
+
+| Command | Meaning |
+|---|---|
+| man ls | documentation for ls |
+| man mkdir | documentation for mkdir |
+| man man | manual for man itself |
+
+### Examples
+
 ```bash
 man ls
+# open documentation for ls command
 ```
-Shows the manual page for `ls` (options, usage, notes).
 
 ```bash
-man mkdir
+man pwd
+# show manual page for pwd
 ```
-Shows how `mkdir` behaves and what flags are available.
 
-```bash
-man man
-```
-Shows documentation about the manual system itself.
+Inside `man`:
 
-**Inside `man`:**
-- Search: type `/keyword` then press Enter
-- Next match: `n`
-- Quit: `q`
+| Key | Action |
+|---|---|
+| q | quit |
+| /word | search |
+| n | next match |
 
 ---
 
-### 3.2 `pwd` — Print Working Directory
+## 3.2 `pwd` — Print Working Directory
 
-**Purpose:** Show your current directory as an **absolute path**.
+### Definition
 
-**Syntax:**
+`pwd` prints the **absolute path of the current directory**.
+
+### Syntax
+
 ```bash
 pwd
 ```
 
-**Examples:**
+### Examples
+
 ```bash
 pwd
+# show current directory
 ```
+
 Example output:
-```bash
+
+```
 /home/student
 ```
 
 ```bash
 cd /etc
 pwd
+# verify the directory change
 ```
-Example output:
-```bash
+
+Output:
+
+```
 /etc
 ```
 
 ---
 
-### 3.3 `mkdir` — Make Directory
+## 3.3 `mkdir` — Make Directory
 
-**Purpose:** Create directories.
+### Definition
 
-**Syntax:**
+`mkdir` creates directories.
+
+### Syntax
+
 ```bash
 mkdir name
 ```
 
-**Examples:**
+### Common options
+
+| Option | Meaning |
+|---|---|
+| -p | create parent directories if needed |
+| -v | verbose output |
+
+### Examples
+
 ```bash
 mkdir project
+# create directory named project
 ```
-Creates a directory called `project`.
 
 ```bash
 mkdir week1 week2 week3
+# create multiple directories
 ```
-Creates multiple directories in one command.
 
 ```bash
-mkdir -p parent/child/grandchild
+mkdir -p course/week1/lab
+# create nested directories
 ```
-Creates nested directories; `-p` creates missing parents.
 
-**Brace expansion (sequence creation):**
 ```bash
 mkdir dir{1..5}
+# create dir1 dir2 dir3 dir4 dir5
 ```
-Creates: `dir1 dir2 dir3 dir4 dir5`
-
-```bash
-mkdir week{1..10}
-```
-Creates: `week1` through `week10`
 
 ```bash
 mkdir lab{A..D}
+# create labA labB labC labD
 ```
-Creates: `labA labB labC labD`
-
-**Note:** `{m..n}` is performed by **Bash** (shell expansion), not by `mkdir` itself.
 
 ---
 
-### 3.4 `cd` — Change Directory
+## 3.4 `cd` — Change Directory
 
-**Purpose:** Move between directories (change the shell’s working context).
+### Definition
 
-**Syntax:**
+`cd` changes the shell's working directory.
+
+### Syntax
+
 ```bash
 cd path
 ```
 
-#### Absolute vs Relative Paths
+### Path types
 
-**Absolute path**
-- Starts at the root `/`
-- Does not depend on where you currently are
+| Type | Example |
+|---|---|
+| Absolute | `/usr/bin` |
+| Relative | `documents` |
 
-Example:
+### Examples
+
 ```bash
-cd /var/log
+cd /etc
+# move to absolute path
 ```
 
-**Relative path**
-- Depends on your current directory
-- Does not start with `/`
-
-Example (from `/home/student`):
 ```bash
 cd project
+# move to project directory relative to current location
 ```
-Moves to `/home/student/project`
 
-#### Multi-level browsing examples
-
-Move up:
 ```bash
 cd ..
+# move up one directory
 ```
-Up one level.
 
 ```bash
 cd ../..
-```
-Up two levels.
-
-Move down multiple levels:
-```bash
-cd parent/child/grandchild
+# move up two directories
 ```
 
-Shortcuts:
 ```bash
 cd ~
+# go to home directory
 ```
-Go to home directory.
 
 ```bash
 cd -
+# go to previous directory
 ```
-Go back to the previous directory.
 
-Core symbols:
-- `.` current directory
-- `..` parent directory
-- `/` filesystem root
+Symbols:
+
+```
+.   current directory
+..  parent directory
+/   root filesystem
+```
 
 ---
 
-### 3.5 `rmdir` — Remove Directory
+## 3.5 `rmdir` — Remove Directory
 
-**Purpose:** Remove **empty** directories only.
+### Definition
 
-**Syntax:**
+`rmdir` removes **empty directories only**.
+
+### Syntax
+
 ```bash
 rmdir name
 ```
 
-**Examples:**
+### Examples
+
 ```bash
 rmdir project
+# remove project directory if empty
 ```
-Removes `project` if it is empty.
 
 ```bash
 rmdir week1 week2
+# remove multiple directories
 ```
-Removes multiple empty directories.
 
 ```bash
 rmdir parent/child
+# remove child directory
 ```
-Removes `child` if it is empty.
 
-**Important rule:** If a directory contains files/subdirectories, `rmdir` will fail.  
-(Recursive removal using `rm -r` is covered later.)
+### Important rule
+
+`rmdir` **fails if directory is not empty**.
+
+Example failure:
+
+```bash
+rmdir project
+# error if project contains files
+```
+
+Recursive deletion will be covered later using `rm -r`.
 
 ---
 
