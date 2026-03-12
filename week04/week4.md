@@ -1,3 +1,4 @@
+
 # Week 4 — Piping, Redirection, and Shell Control Structures
 
 ## Table of Contents
@@ -9,10 +10,11 @@
    4.2 [`awk`](#42-awk)  
    4.3 [`uniq`](#43-uniq)  
    4.4 [`join`](#44-join)  
-   4.5 [`paste`](#45-paste)  
-   4.6 [`split`](#46-split)  
+   4.5 [`split`](#45-split)  
+   4.6 [`paste`](#46-paste)  
    4.7 [`tr`](#47-tr)  
    4.8 [`pr`](#48-pr)  
+   4.9 [`diff`](#49-diff)  
 5. [Loops and Control Structures](#5-loops-and-control-structures)  
    5.1 [`for`](#51-for-loop)  
    5.2 [`while`](#52-while-loop)  
@@ -31,6 +33,7 @@ Datasets used in examples (must exist in the repo):
 A **pipe** redirects the **standard output (stdout)** of one command into the **standard input (stdin)** of another command.
 
 Pipe operator:
+
 ```
 |
 ```
@@ -38,125 +41,91 @@ Pipe operator:
 A **pipeline** is one or more commands separated by `|`.
 
 ## Usage
+
 ```bash
 command1 | command2 | command3
 ```
 
-## Common patterns (with `animals.txt`)
+## Examples
 
-Normalize case, sort, remove duplicates:
 ```bash
 cat animals.txt | tr 'A-Z' 'a-z' | sort | uniq
+# convert all names to lowercase, sort them, then remove duplicates
 ```
 
-Count total lines:
 ```bash
 cat animals.txt | wc -l
+# count the total number of lines in animals.txt
 ```
 
-Count unique animal names (case-insensitive):
 ```bash
 cat animals.txt | tr 'A-Z' 'a-z' | sort | uniq | wc -l
+# count how many unique animal names exist
 ```
 
-Count occurrences (case-insensitive):
 ```bash
 cat animals.txt | tr 'A-Z' 'a-z' | sort | uniq -c
+# count occurrences of each animal name
 ```
 
-Pick the 3rd line of a listing (example pattern):
 ```bash
 ls -l | head -4 | tail -1
+# extract the third line from an ls listing
 ```
-
-## Notes
-- Only **stdout** is piped by default (stderr is not).
-- Each command in a pipeline runs as a **separate process**, typically in parallel.
 
 ---
 
 # 2. Redirection
 
 ## Definition
-**Redirection** changes where a command reads input from (stdin) or writes output to (stdout/stderr).
-
-## Standard streams and file descriptors
+Redirection changes where a command reads input from or writes output to.
 
 | Stream | FD | Default |
-|---|---:|---|
+|---|---|---|
 | STDIN | 0 | keyboard |
 | STDOUT | 1 | terminal |
 | STDERR | 2 | terminal |
 
-## Output redirection
+## Examples
 
-Overwrite a file:
 ```bash
 ls -l > out.txt
+# write output to a file (overwrite)
 ```
 
-Append to a file:
 ```bash
 ls -l >> out.txt
+# append output to a file
 ```
 
-Create/empty a file quickly:
 ```bash
 > out.txt
+# create or empty a file quickly
 ```
 
-## Input redirection
-
-Read stdin from a file:
 ```bash
 wc -l < animals.txt
+# count lines using input redirection
 ```
 
-Difference between “argument” vs “redirected stdin”:
-```bash
-wc -l animals.txt
-wc -l < animals.txt
-```
-
-## Error redirection
-
-Redirect errors (stderr) only:
 ```bash
 ls missing_file 2> errors.txt
+# redirect only error messages to a file
 ```
 
-Redirect stdout and stderr to the same file:
 ```bash
 ls animals.txt missing_file > all.txt 2>&1
+# redirect stdout and stderr to the same file
 ```
 
-## Explicit descriptor forms
-
-These are equivalent to the simpler versions:
-```bash
-ls -l 1> out.txt
-cat 0< animals.txt
-ls missing_file 2> errors.txt
-```
-
-## Useful redirection combinations
-
-Discard output (send to “null device”):
 ```bash
 ls missing_file 2> /dev/null
-```
-
-Keep stdout on screen, send stderr to file:
-```bash
-ls animals.txt missing_file 2> errors.txt
+# discard error output
 ```
 
 ---
 
 # 3. Special Shell Parameters
-
-## Definition
-Special parameters are variables provided by the shell to expose script arguments, process info, and status codes.
 
 | Parameter | Meaning |
 |---|---|
@@ -164,398 +133,221 @@ Special parameters are variables provided by the shell to expose script argument
 | `$1..$9` | positional arguments |
 | `$#` | number of arguments |
 | `$*` | all arguments as one string |
-| `$@` | all arguments as separate strings |
+| `$@` | all arguments individually |
 | `$?` | exit status of last command |
-| `$$` | process ID of current shell/script |
+| `$$` | process ID |
 
-## Example (use in a script)
+Example:
 
 ```bash
 #!/usr/bin/env bash
 
-echo "$0"
-echo "$#"
-echo "$*"
-echo "$@"
-echo "$$"
-echo "$?"
-```
-
-## Exit status
-- `0` means **success**
-- non-zero means **failure** (or a specific error code)
-
-Example:
-```bash
-false
-echo $?
+echo "$0"   # print script name
+echo "$#"   # print number of arguments
+echo "$*"   # print arguments as a single string
+echo "$@"   # print arguments individually
+echo "$$"   # print process id of script
+echo "$?"   # print exit status of previous command
 ```
 
 ---
 
 # 4. Unix Text Processing Filters
 
-Filters read from **stdin** (or files), transform text, and write to **stdout**.
+Filters read from **stdin**, process the text, and write to **stdout**.
 
 ---
 
-## 4.1 cut
+# 4.1 cut
 
-## Definition
-`cut` extracts **columns** from each line of input:
-- by **character position** (`-c`)
-- by **field** (`-f`) with a delimiter (`-d`)
-
-## Usage
-```bash
-cut -c LIST file
-cut -d DELIM -f LIST file
-```
-
-## Common options
-| Option | Meaning |
-|---|---|
-| `-c LIST` | select character positions |
-| `-d DELIM` | field delimiter |
-| `-f LIST` | select fields |
-| `--complement` | select everything *except* LIST (GNU) |
-| `-s` | suppress lines with no delimiter |
-
-## Examples (with `list.txt`)
-
-First 10 characters:
 ```bash
 cut -c1-10 list.txt
+# extract the first 10 characters of each line
 ```
 
-Multiple character ranges:
 ```bash
 cut -c1-10,20-30 list.txt
+# extract two character ranges from each line
 ```
 
-Everything from character 11 to end:
-```bash
-cut -c11- list.txt
-```
-
-Extract permissions only (first 10 chars):
-```bash
-cut -c1-10 list.txt
-```
-
-Extract file name (9th field, space-delimited):
 ```bash
 cut -d' ' -f9 list.txt
+# extract the 9th field (filename column)
 ```
 
-Extract size + filename (5th and 9th fields):
-```bash
-cut -d' ' -f5,9 list.txt
-```
-
-Use a safer pipeline to handle multiple spaces (normalize whitespace first):
 ```bash
 tr -s ' ' < list.txt | cut -d' ' -f5,9
-```
-
-Suppress lines without the delimiter (useful on mixed input):
-```bash
-cut -d' ' -f9 -s list.txt
-```
-
-Complement example (GNU systems):
-```bash
-tr -s ' ' < list.txt | cut -d' ' -f1-8 --complement
+# normalize spaces then extract size and filename fields
 ```
 
 ---
 
-## 4.2 awk
+# 4.2 awk
 
-## Definition
-`awk` is a text processing language. It reads input line-by-line (records), splits each line into fields, and runs actions.
-
-Field basics:
-- `$0` = whole line
-- `$1` = first field, `$2` = second field, ...
-- `NF` = number of fields in current line
-- `NR` = current line number (record number)
-
-## Usage
-```bash
-awk 'pattern { action }' file
-awk -F 'DELIM' 'pattern { action }' file
-```
-
-## Common options / features
-| Feature | Meaning |
-|---|---|
-| `-F` | set field separator |
-| `BEGIN {}` | run once before reading input |
-| `END {}` | run once after reading input |
-| `printf` | formatted output |
-| `if`, `for`, `while` | control structures |
-| associative arrays | counting/grouping |
-
-## Examples (with `list.txt`)
-
-Print file name column:
 ```bash
 awk '{print $9}' list.txt
+# print filename column
 ```
 
-Print permissions + filename:
 ```bash
 awk '{print $1, $9}' list.txt
+# print permissions and filename
 ```
 
-Print line number + filename:
 ```bash
 awk '{print NR, $9}' list.txt
+# print line number and filename
 ```
 
-Print “size filename” with formatting (`printf`):
 ```bash
-awk '{printf "size=%s file=%s\n", $5, $9}' list.txt
-```
-
-Only show executable files (permission starts with `-rwx`):
-```bash
-awk '$1 ~ /^-rwx/ {print $9}' list.txt
-```
-
-Sum file sizes (field 5) and print total:
-```bash
-awk '{sum += $5} END {print "total_bytes:", sum}' list.txt
-```
-
-Show last field using `NF` (works even if field count changes):
-```bash
-awk '{print $NF}' list.txt
-```
-
-Loop example: print all fields with their index (per line):
-```bash
-awk '{
-  for (i = 1; i <= NF; i++) printf "[%d]=%s ", i, $i
-  print ""
-}' list.txt
-```
-
-Count file extensions (simple example):
-```bash
-awk '{
-  n = split($9, a, ".")
-  ext = (n > 1) ? a[n] : "(noext)"
-  count[ext]++
-}
-END {
-  for (e in count) printf "%s %d\n", e, count[e]
-}' list.txt
-```
-
-Examples (with `animals.txt`)
-
-Normalize case, then count occurrences using awk:
-```bash
-cat animals.txt | tr 'A-Z' 'a-z' | awk '{count[$0]++} END {for (a in count) print a, count[a]}'
-```
-
-Print only lines that match “lion” (after case normalization):
-```bash
-cat animals.txt | tr 'A-Z' 'a-z' | awk '$0 == "lion" {print NR, $0}'
+awk '{sum += $5} END {print sum}' list.txt
+# sum all file sizes
 ```
 
 ---
 
-## 4.3 uniq
+# 4.3 uniq
 
-## Definition
-`uniq` removes **adjacent duplicates**. It usually requires sorted input.
-
-## Usage
-```bash
-sort file | uniq
-```
-
-## Common options
-| Option | Meaning |
-|---|---|
-| `-c` | prefix lines by count |
-| `-d` | show duplicated lines only |
-| `-u` | show unique (non-duplicated) lines only |
-
-## Examples (with `animals.txt`)
-
-Case-insensitive unique list:
 ```bash
 cat animals.txt | tr 'A-Z' 'a-z' | sort | uniq
+# show unique animal names ignoring case
 ```
 
-Counts:
 ```bash
 cat animals.txt | tr 'A-Z' 'a-z' | sort | uniq -c
+# show counts of each animal
 ```
 
-Only duplicates:
 ```bash
 cat animals.txt | tr 'A-Z' 'a-z' | sort | uniq -d
+# show only duplicated animals
 ```
 
 ---
 
-## 4.4 join
+# 4.4 join
 
-## Definition
-`join` combines two **sorted** files using a common key field (like a simple SQL join).
-
-## Usage
 ```bash
-join [options] file1 file2
-```
-
-## Common options
-| Option | Meaning |
-|---|---|
-| `-1 N` | join field in file1 is field N |
-| `-2 N` | join field in file2 is field N |
-| `-t C` | field separator |
-| `-a N` | also print unpaired lines from file N |
-| `-o` | control output fields |
-
-## Example template
-```bash
-# files must be sorted on the join field
 join -1 1 -2 1 file1_sorted.txt file2_sorted.txt
+# join two sorted files using the first column as key
 ```
 
 ---
 
-## 4.5 paste
+# 4.5 split
 
-## Definition
-`paste` merges files **line-by-line** as columns.
-
-## Usage
-```bash
-paste [options] file1 file2
-```
-
-## Common options
-| Option | Meaning |
-|---|---|
-| `-d C` | delimiter |
-| `-s` | serial mode (merge lines from one file) |
-
-## Examples
-```bash
-paste file1.txt file2.txt
-paste -d ':' file1.txt file2.txt
-paste -s animals.txt
-```
-
----
-
-## 4.6 split
-
-## Definition
-`split` breaks a file into smaller files.
-
-## Usage
-```bash
-split -l LINES input [prefix]
-```
-
-## Common options
-| Option | Meaning |
-|---|---|
-| `-l N` | split by N lines |
-| `-b SIZE` | split by size (implementation-dependent) |
-
-## Examples
-Split `animals.txt` into chunks of 5 lines:
 ```bash
 split -l 5 animals.txt chunk_
+# split animals.txt into files of 5 lines each
 ```
 
-Reassemble:
 ```bash
 cat chunk_* > animals_joined.txt
+# reconstruct the original file by concatenating chunks
 ```
 
 ---
 
-## 4.7 tr
+# 4.6 paste
 
-## Definition
-`tr` translates or deletes characters from stdin to stdout.
+Examples using files produced by `split`.
 
-## Usage
 ```bash
-tr 'FROM' 'TO'
-tr -d 'CHARS'
-tr -s 'CHARS'
+paste chunk_aa chunk_ab
+# merge two chunk files side by side
 ```
 
-## Common options
-| Option | Meaning |
-|---|---|
-| `-d` | delete characters |
-| `-s` | squeeze repeats |
-| `-c` | complement (inverse set) |
+```bash
+paste -d ':' chunk_aa chunk_ab
+# merge files using ':' as delimiter
+```
 
-## Examples (with `animals.txt`)
+```bash
+paste -d ',' chunk_aa chunk_ab
+# merge files using comma delimiter
+```
 
-Uppercase → lowercase:
+---
+
+# 4.7 tr
+
 ```bash
 cat animals.txt | tr 'A-Z' 'a-z'
+# convert uppercase letters to lowercase
 ```
 
-Delete all vowels:
+```bash
+cat animals.txt | tr 'a-z' 'A-Z'
+# convert lowercase letters to uppercase
+```
+
 ```bash
 cat animals.txt | tr -d 'aeiouAEIOU'
+# delete all vowels from the input
 ```
 
-Squeeze repeated spaces (useful before `cut` on space-separated text):
 ```bash
 tr -s ' ' < list.txt
+# squeeze repeated spaces into one space
+```
+
+```bash
+cat animals.txt | tr ' ' '_'
+# replace spaces with underscores
+```
+
+```bash
+cat animals.txt | tr -cd 'a-zA-Z\n'
+# remove all characters except letters and newline
 ```
 
 ---
 
-## 4.8 pr
+# 4.8 pr
 
-## Definition
-`pr` paginates and formats text for printing (headers, columns, numbering).
-
-## Usage
 ```bash
-pr [options] file
+pr -n animals.txt
+# print file with numbered lines
 ```
 
-## Common options
-| Option | Meaning |
-|---|---|
-| `-n` | line numbering |
-| `-h "TITLE"` | header title |
-| `-l N` | page length |
-| `-2`, `-3` | multi-column output (2 or 3 columns) |
+```bash
+pr -h "Animals Report" animals.txt
+# print file with a header title
+```
+
+```bash
+pr -2 animals.txt
+# print output in two columns
+```
+
+```bash
+pr -t animals.txt
+# print file without page headers or formatting
+```
+
+---
+
+# 4.9 diff
+
+## Definition
+
+`diff` compares two files and shows the differences between them.
 
 ## Examples
 
-Number lines:
 ```bash
-pr -n animals.txt
+diff file1.txt file2.txt
+# show differences between two files
 ```
 
-Add a title header:
 ```bash
-pr -h "Animals Report" animals.txt
+diff -u file1.txt file2.txt
+# show unified diff format (used in patches and git)
 ```
 
-Two columns:
 ```bash
-pr -2 animals.txt
+diff animals.txt animals_joined.txt
+# compare original file and reconstructed file
 ```
 
 ---
@@ -564,55 +356,28 @@ pr -2 animals.txt
 
 ---
 
-## 5.1 for Loop
+# 5.1 for Loop
 
-## Definition
-A `for` loop iterates over a list of values.
-
-## Usage
-```bash
-for item in list
-do
-  commands
-done
-```
-
-## Examples
-
-Iterate words from a file (simple):
 ```bash
 for a in $(cat animals.txt)
 do
   echo "$a"
 done
+# print each word from animals.txt
 ```
 
-Case-insensitive frequency report using a loop + pipeline:
 ```bash
 for a in $(cat animals.txt | tr 'A-Z' 'a-z')
 do
   echo "$a"
 done | sort | uniq -c
+# generate a frequency report of animals
 ```
 
 ---
 
-## 5.2 while Loop
+# 5.2 while Loop
 
-## Definition
-A `while` loop repeats while a condition is true.
-
-## Usage
-```bash
-while [ condition ]
-do
-  commands
-done
-```
-
-## Examples
-
-Count from 1 to 5:
 ```bash
 n=1
 while [ $n -le 5 ]
@@ -620,66 +385,37 @@ do
   echo $n
   n=$((n + 1))
 done
+# count from 1 to 5
 ```
 
-Read a file line-by-line (recommended pattern):
 ```bash
 while IFS= read -r line
 do
   echo "LINE: $line"
 done < animals.txt
+# read file line by line safely
 ```
 
 ---
 
-## 5.3 select + case + PS1
-
-## Definition
-- `select` creates a simple menu loop.
-- `case` matches multiple patterns cleanly.
-- `PS1` controls the shell prompt string.
-
-## Usage (menu)
-```bash
-select choice in A B C
-do
-  case "$choice" in
-    A) ... ;;
-    B) ... ;;
-    *) ... ;;
-  esac
-done
-```
-
-## Example: menu tool for `animals.txt` (case-insensitive)
+# 5.3 select + case + PS1
 
 ```bash
-#!/usr/bin/env bash
-
-PS1="USP> "
-
-select action in "List unique (case-insensitive)" "Count occurrences" "Show only lions" "Quit"
+select action in "List unique" "Count occurrences" "Quit"
 do
   case "$action" in
-    "List unique (case-insensitive)")
+    "List unique")
       cat animals.txt | tr 'A-Z' 'a-z' | sort | uniq
       ;;
     "Count occurrences")
       cat animals.txt | tr 'A-Z' 'a-z' | sort | uniq -c
       ;;
-    "Show only lions")
-      cat animals.txt | tr 'A-Z' 'a-z' | awk '$0 == "lion" {print NR, $0}'
-      ;;
     "Quit")
       break
       ;;
     *)
-      echo "Invalid selection"
+      echo "Invalid option"
       ;;
   esac
 done
-```
-
----
-
-**End of Week 4**
+# simple interactive menu
