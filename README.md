@@ -1,5 +1,5 @@
 
-# USP Lectures
+# Unix System Programming (Bash & Python)
 
 Unix Systems Programming lecture materials and demos.
 
