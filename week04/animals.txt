@@ -14,7 +14,7 @@ LEAPORD
 lion
 dog
 leapord
-car
+cat
 dog
 lion
 Cat
