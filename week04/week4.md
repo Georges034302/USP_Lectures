@@ -22,7 +22,7 @@
 Datasets used in examples (must exist in the repo):
 
 - `animals.txt`
-- `list.txt`
+- `countries.txt`
 
 ---
 
@@ -68,8 +68,13 @@ cat animals.txt | tr 'A-Z' 'a-z' | sort | uniq -c
 ```
 
 ```bash
-ls -l | head -4 | tail -1
-# extract the third line from an ls listing
+awk 'NR>1 {print $2}' countries.txt | sort
+# extract country names from countries.txt and sort them alphabetically
+```
+
+```bash
+awk 'NR>1 {print $1}' countries.txt | sort | uniq -c | sort -nr
+# count how many countries belong to each continent and sort by frequency
 ```
 
 ## Notes
@@ -125,8 +130,8 @@ wc -l < animals.txt
 ```
 
 ```bash
-wc -l animals.txt
-# count lines by passing animals.txt as a command argument
+wc -l countries.txt
+# count lines in countries.txt by passing the file as a command argument
 ```
 
 ```bash
@@ -145,8 +150,8 @@ ls missing_file 2> /dev/null
 ```
 
 ```bash
-ls animals.txt missing_file 2> errors.txt
-# keep normal output on screen but save errors in a file
+awk 'NR>1 {print $2}' countries.txt > country_names.txt
+# save extracted country names into a new file
 ```
 
 ---
@@ -219,37 +224,51 @@ cut -d DELIM -f LIST file
 | `-s` | suppress lines with no delimiter |
 | `--complement` | select everything except the chosen fields or characters |
 
-## Examples
+## Examples with `countries.txt`
 
 ```bash
-cut -c1-10 list.txt
-# extract the first 10 characters from each line
+cut -d' ' -f1 countries.txt
+# extract the first field (continent column), including the header row
 ```
 
 ```bash
-cut -c1-10,20-30 list.txt
+tail -n +2 countries.txt | cut -d' ' -f2
+# skip the header row, then extract the country column
+```
+
+```bash
+cut -d' ' -f2,3 countries.txt
+# extract the country and capital columns
+```
+
+```bash
+cut -d' ' -f1,4 countries.txt
+# extract the continent and population columns
+```
+
+```bash
+cut -c1-10 countries.txt
+# extract the first 10 characters of each line as raw text
+```
+
+```bash
+cut -c1-10,20-30 countries.txt
 # extract two character ranges from each line
 ```
 
 ```bash
-cut -c11- list.txt
+cut -c11- countries.txt
 # extract from character 11 to the end of each line
 ```
 
 ```bash
-cut -d' ' -f9 list.txt
-# extract the 9th space-delimited field
+cut -d' ' -f2 -s countries.txt
+# extract field 2 and suppress lines without the delimiter
 ```
 
-```bash
-tr -s ' ' < list.txt | cut -d' ' -f5,9
-# normalize repeated spaces, then extract size and filename fields
-```
-
-```bash
-cut -d' ' -f9 -s list.txt
-# extract field 9 and skip lines that do not contain the delimiter
-```
+## Notes
+- `cut -d' '` works best when the file is consistently space-delimited.
+- `cut` works on raw character positions with `-c`, and on delimited fields with `-d` and `-f`.
 
 ---
 
@@ -277,41 +296,66 @@ awk -F 'DELIM' 'pattern { action }' file
 | `NF` | number of fields in the current line |
 | `NR` | current record number (line number) |
 
-## Examples with `list.txt`
+## Examples with `countries.txt`
 
 ```bash
-awk '{print $9}' list.txt
-# print the filename column
+awk '{print}' countries.txt
+# print all lines exactly as they appear
 ```
 
 ```bash
-awk '{print $1, $9}' list.txt
-# print permissions and filename
+awk 'NR==1' countries.txt
+# print only the header row
 ```
 
 ```bash
-awk '{print NR, $9}' list.txt
-# print the line number and filename
+awk 'NR>1 {print $2}' countries.txt
+# print the country column and skip the header row
 ```
 
 ```bash
-awk '{printf "size=%s file=%s\n", $5, $9}' list.txt
-# print the size and filename using formatted output
+awk 'NR>1 && $1=="Europe" {print $2}' countries.txt
+# list countries where the continent is Europe
 ```
 
 ```bash
-awk '$1 ~ /^-rwx/ {print $9}' list.txt
-# print files whose permission field starts with -rwx
+awk '{print NR"-", $2}' countries.txt
+# print line numbering together with the second column
 ```
 
 ```bash
-awk '{sum += $5} END {print "total_bytes:", sum}' list.txt
-# sum the file sizes in column 5 and print the total
+awk 'NR>1 {printf "%-10s %-15s %-12s %s\n", $1, $2, $3, $4}' countries.txt
+# print a formatted table of continent, country, capital, and population
 ```
 
 ```bash
-awk '{print $NF}' list.txt
-# print the last field of each line
+awk 'NR>1 {c[$1]++} END {for (k in c) printf "%-10s %2d\n", k, c[k]}' countries.txt
+# count how many countries appear under each continent
+```
+
+```bash
+awk 'NR>1 {g[$1]=g[$1] ? g[$1] ", " $2 : $2} END {for (k in g) print k ": " g[k]}' countries.txt
+# group country names by continent
+```
+
+```bash
+awk 'NR>1 {print $2}' countries.txt | sort
+# extract countries and sort them alphabetically
+```
+
+```bash
+awk 'NR>1 {print $1}' countries.txt | sort | uniq -c | sort -nr
+# count continent frequencies and sort them in descending order
+```
+
+```bash
+awk 'NR>1 && $2 ~ /^S.*/ {print $1, $2}' countries.txt
+# print continents and countries whose country names start with S
+```
+
+```bash
+awk 'NR>1 && $2 ~ /_/ {print $1, $2}' countries.txt
+# print countries that contain underscores in their names
 ```
 
 ## Examples with `animals.txt`
@@ -368,6 +412,11 @@ cat animals.txt | tr 'A-Z' 'a-z' | sort | uniq -d
 ```bash
 cat animals.txt | tr 'A-Z' 'a-z' | sort | uniq -u
 # show only animal names that appear exactly once
+```
+
+```bash
+awk 'NR>1 {print $1}' countries.txt | sort | uniq -c
+# count how many rows belong to each continent
 ```
 
 ---
@@ -452,8 +501,8 @@ split -l 5 animals.txt chunk_
 ```
 
 ```bash
-split -l 3 list.txt list_chunk_
-# split list.txt into files of 3 lines each
+split -l 4 countries.txt countries_chunk_
+# split countries.txt into files of 4 lines each
 ```
 
 ```bash
@@ -498,6 +547,11 @@ paste -d ':' chunk_aa chunk_ab
 ```bash
 paste -d ',' chunk_aa chunk_ab
 # merge two chunk files using a comma as the delimiter
+```
+
+```bash
+paste countries_chunk_aa countries_chunk_ab
+# merge two split country files side by side
 ```
 
 ```bash
@@ -546,8 +600,18 @@ cat animals.txt | tr -d 'aeiouAEIOU'
 ```
 
 ```bash
-tr -s ' ' < list.txt
-# squeeze repeated spaces in list.txt into one space
+cat countries.txt | tr '_' ' '
+# replace underscores with spaces in multi-word names
+```
+
+```bash
+cat countries.txt | tr 'A-Z' 'a-z'
+# convert all country data to lowercase
+```
+
+```bash
+cat countries.txt | tr -d 'M'
+# remove the M suffix from population values
 ```
 
 ```bash
@@ -558,11 +622,6 @@ cat animals.txt | tr ' ' '_'
 ```bash
 cat animals.txt | tr -cd 'a-zA-Z\n'
 # remove everything except letters and newline characters
-```
-
-```bash
-cat list.txt | tr '\t' ' '
-# replace tab characters with spaces
 ```
 
 ```bash
@@ -616,8 +675,8 @@ pr -t animals.txt
 ```
 
 ```bash
-pr -l 20 list.txt
-# print list.txt using a page length of 20 lines
+pr -l 20 countries.txt
+# print countries.txt using a page length of 20 lines
 ```
 
 ---
@@ -702,6 +761,14 @@ done | sort | uniq -c
 ```
 
 ```bash
+for c in $(awk 'NR>1 {print $2}' countries.txt)
+do
+  echo "$c"
+done
+# print each country name from countries.txt
+```
+
+```bash
 for f in chunk_*
 do
   wc -l "$f"
@@ -750,7 +817,15 @@ while IFS= read -r line
 do
   echo "$line" | tr 'A-Z' 'a-z'
 done < animals.txt
-# read each line and convert it to lowercase
+# read each animal line and convert it to lowercase
+```
+
+```bash
+while IFS= read -r line
+do
+  echo "$line"
+done < countries.txt
+# read countries.txt line by line safely
 ```
 
 ---
@@ -783,20 +858,20 @@ done
 PS1="USP> "
 # set a custom shell prompt
 
-select action in "List unique (case-insensitive)" "Count occurrences" "Show only lions" "Quit"
+select action in "List unique animals" "Count animal occurrences" "List European countries" "Quit"
 do
   case "$action" in
-    "List unique (case-insensitive)")
+    "List unique animals")
       cat animals.txt | tr 'A-Z' 'a-z' | sort | uniq
       # list unique animal names ignoring case
       ;;
-    "Count occurrences")
+    "Count animal occurrences")
       cat animals.txt | tr 'A-Z' 'a-z' | sort | uniq -c
       # count how many times each animal appears
       ;;
-    "Show only lions")
-      cat animals.txt | tr 'A-Z' 'a-z' | awk '$0 == "lion" {print NR, $0}'
-      # show only lines that exactly contain lion
+    "List European countries")
+      awk 'NR>1 && $1=="Europe" {print $2}' countries.txt
+      # print country names where continent is Europe
       ;;
     "Quit")
       break
