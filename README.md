@@ -1,3 +1,4 @@
+
 # USP Lectures
 
 Unix Systems Programming lecture materials and demos.
@@ -107,6 +108,48 @@ The material introduces Unix fundamentals, command-line tools, file systems, and
 
 ---
 
+<details>
+<summary><strong>Week 04 — Piping, Redirection, and Shell Control Structures</strong></summary>
+
+### Topics covered
+
+- Unix pipelines and command chaining
+- Standard streams (stdin, stdout, stderr)
+- Input and output redirection
+- Error redirection and null device usage
+- Special shell parameters
+- Unix text processing filters
+- Looping constructs and interactive menus in Bash
+
+### Commands introduced
+
+- `cut`
+- `awk`
+- `uniq`
+- `join`
+- `split`
+- `paste`
+- `tr`
+- `pr`
+- `diff`
+
+### Concepts
+
+- Pipelines and process chaining
+- File descriptors (0, 1, 2)
+- Text processing filters
+- Structured shell loops (`for`, `while`)
+- Interactive shell menus using `select` and `case`
+
+### Data files used
+
+- `animals.txt`
+- `list.txt`
+
+</details>
+
+---
+
 # Requirements
 
 To run the examples you need:
@@ -117,4 +160,4 @@ To run the examples you need:
 
 ---
 
-#### 👤 <sub><em>Author: *Georges Bou Ghantous</em></sub>*
+#### 👤 <sub><em>Author: *Georges Bou Ghantous*</em></sub>
