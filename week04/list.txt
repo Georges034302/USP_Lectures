@@ -1,4 +1,0 @@
--rwxrw-r-- 1 george george  383 Feb 26 20:05 args.sh
--rwxrw-r-- 1 george george  229 Feb 26 19:54 command.sh
--rwxrw-r-- 1 george george  169 Feb 26 20:09 input.sh
--rw-rw-r-- 1 george george 2614 Feb 26 20:10 unix1.txt
