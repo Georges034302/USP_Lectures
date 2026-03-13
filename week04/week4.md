@@ -17,7 +17,7 @@
 5. [Loops and Control Structures](#5-loops-and-control-structures)  
    5.1 [`for`](#51-for-loop)  
    5.2 [`while`](#52-while-loop)  
-   5.3 [`select + case + PS1`](#53-select--case--ps1)  
+   5.3 [`select + case + PS3`](#53-select--case--ps3)  
 
 Datasets used in examples (must exist in the repo):
 
@@ -830,12 +830,12 @@ done < countries.txt
 
 ---
 
-# 5.3 select + case + PS1
+# 5.3 select + case + PS3
 
 ## Definition
 - `select` creates a simple menu loop.
 - `case` matches multiple patterns clearly.
-- `PS1` controls the shell prompt string.
+- `PS3` controls the shell prompt string.
 
 ## Usage
 
@@ -855,7 +855,7 @@ done
 ```bash
 #!/usr/bin/env bash
 
-PS1="USP> "
+PS3="USP> "
 # set a custom shell prompt
 
 select action in "List unique animals" "Count animal occurrences" "List European countries" "Quit"
