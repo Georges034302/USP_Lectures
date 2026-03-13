@@ -1,3 +1,4 @@
+
 # Week 6 — Unix Filesystem Internals
 
 ## Table of Contents
@@ -27,6 +28,12 @@
    5.2 [Practical Hard Link Demonstration](#52-practical-hard-link-demonstration)  
    5.3 [Removing Links and File Deletion](#53-removing-links-and-file-deletion)  
    5.4 [Directory Link Counts](#54-directory-link-counts)  
+6. [Symbolic Links (Soft Links)](#6-symbolic-links-soft-links)  
+   6.1 [Concept and Definition](#61-concept-and-definition)  
+   6.2 [Creating Symbolic Links](#62-creating-symbolic-links)  
+   6.3 [Inspecting Symbolic Links](#63-inspecting-symbolic-links)  
+   6.4 [Broken Symbolic Links](#64-broken-symbolic-links)  
+   6.5 [Hard Links vs Symbolic Links](#65-hard-links-vs-symbolic-links)
 
 ---
 
@@ -998,6 +1005,150 @@ The child itself usually starts with link count 2 because it has:
 
 - its name in `parent`
 - its own `.` entry
+
+---
+
+# 6. Symbolic Links (Soft Links)
+
+## 6.1 Concept and Definition
+
+A **symbolic link** (also called a **soft link**) is a special file whose content is a **pathname pointing to another file**.
+
+Unlike a hard link, a symbolic link does **not refer directly to the target file’s inode**. Instead, it stores the **path of the target file**. When the symbolic link is accessed, the kernel follows the stored path and resolves the actual file.
+
+Conceptual structure:
+
+```text
+symbolic link file
+        ↓
+stored path string
+        ↓
+target file
+        ↓
+target inode
+        ↓
+data blocks
+```
+
+Key idea:
+
+```text
+hard link      → inode directly
+symbolic link  → pathname → inode
+```
+
+## 6.2 Creating Symbolic Links
+
+Symbolic links are created with the `-s` option of the `ln` command.
+
+```bash
+ln -s target_file link_name
+```
+
+Example:
+
+```bash
+ln -s report.txt report_link.txt
+# create a symbolic link pointing to report.txt
+```
+
+After this command:
+
+- `report_link.txt` is a symbolic link
+- its content is the path `report.txt`
+
+## 6.3 Inspecting Symbolic Links
+
+To inspect a symbolic link, use:
+
+```bash
+ls -l
+```
+
+Example output:
+
+```text
+lrwxrwxrwx 1 student staff 10 report_link.txt -> report.txt
+```
+
+Interpretation:
+
+```text
+l   → indicates a symbolic link
+->  → shows the target path
+```
+
+To view inode numbers:
+
+```bash
+ls -li report.txt report_link.txt
+```
+
+Example pattern:
+
+```text
+672300 -rw-r--r-- 1 student staff 25 report.txt
+672450 lrwxrwxrwx 1 student staff 10 report_link.txt -> report.txt
+```
+
+Notice:
+
+- the symbolic link has **its own inode**
+- it does **not share the inode** of the target file
+
+## 6.4 Broken Symbolic Links
+
+If the target file is removed, the symbolic link becomes **dangling (broken)**.
+
+Example:
+
+```bash
+rm report.txt
+# delete the target file
+
+cat report_link.txt
+```
+
+Result:
+
+```text
+No such file or directory
+```
+
+Explanation:
+
+The symbolic link still exists, but the path it references no longer resolves to a valid file.
+
+Conceptual situation:
+
+```text
+symbolic link
+      ↓
+stored path → report.txt
+      ↓
+target missing
+```
+
+## 6.5 Hard Links vs Symbolic Links
+
+| Feature | Hard Link | Symbolic Link |
+|-------|-----------|---------------|
+| References inode directly | Yes | No |
+| References pathname | No | Yes |
+| Same inode as target | Yes | No |
+| Works across filesystems | No | Yes |
+| Works for directories | Usually No | Yes |
+| Breaks if target removed | No | Yes |
+
+Summary:
+
+```text
+hard link:
+filename → inode → data
+
+symbolic link:
+filename → path → inode → data
+```
 
 ---
 
