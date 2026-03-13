@@ -1,0 +1,160 @@
+cat animals.txt 
+cat animals.txt | nl
+clear
+head -10 animals.txt 
+head -10 animals.txt | sort
+head -10 animals.txt | sort | nl
+clear
+head -10 animals.txt | sort | nl
+headfghd -10 animals.txt | sort | nl
+head -10 animals.txt | sorght | nl
+headfghd -10 animals.txt | sort | nfghl
+head -10 animals.txt | sort | nlghffj
+clear
+head -10 animals.txt | sort | nl
+head -10 animals.txt ; echo "Hello" ; wc animals.txt 
+clear
+heasddfd -10 animals.txt ; echo "Hello" ; wc animals.txt 
+head -10 animals.txt ; echo "Hello" ; whcc animals.txt 
+clear
+head -10 animals.txt ; echo "Hello" ; wc animals.txt 
+head -10 animals.txt && echo "Hello" && wc animals.txt 
+heahhhhhd -10 animals.txt && echo "Hello" && wc animals.txt 
+head -10 animals.txt && echfjhgfjgo "Hello" && wc animals.txt 
+clear
+head -10 animals.txt && echfjhgfjgo "Hello" && wc animals.txt 
+head -10 animals.txt || echo "Hello" || wc animals.txt 
+hdfsdead -10 animals.txt || echo "Hello" || wc animals.txt 
+hdfsdead -10 animals.txt || echdasdo "Hello" || wc animals.txt 
+clear
+echo hello
+echo $?
+echojkdkfbd hello
+echo $?
+wc animals.txt 
+echo $$
+clear
+echo hello
+echaddsao hello
+touch f1 f2
+echo "Hello World" > f1
+cat f1
+echo "USP" > f1
+cat f1
+echo "Aut2026" >> f1
+cat f1
+chmod 000 f2
+cat f2
+ls -l f2
+cat f2
+cat f2 > err.txt 
+cat err.txt 
+cat f2 2> err.txt 
+cat err.txt 
+clear
+cat f? > out.txt 2>> err.txt 
+cat out.txt 
+cat err.txt 
+echo "Unix is fun" >> out.txt 
+cat out.txt 
+echo "Tee is cool" | tee out.txt 
+cat out.txt 
+echo "Tee is cool" | tee -a out.txt 
+cat out.txt 
+clear
+sort animals.txt 
+sort -r animals.txt 
+sort -rf animals.txt 
+sort -ru animals.txt 
+clear
+rm out.txt 
+ls
+rm err.txt 
+ls
+rm f?
+clear
+ls
+ls -l
+ls -l | tail -n+2
+ls -l | tail -n+2 | cut -d " " -f 1
+ls -l | tail -n+2 | cut -d " " -f 1,4
+ls -l | tail -n+2 | cut -d " " -f 1-4
+ls -l | tail -n+2 | cut -d " " -f 1-5
+clear
+ls -l | tail -n+2 | awk '{print $1 $5}'
+ls -l | tail -n+2 | cut -d " " -f 5,9
+ls -l | tail -n+2 | awk '{print $5 $8}'
+ls -l | tail -n+2 | awk '{print $5 $0}'
+ls -l | tail -n+2 | awk '{print $5 $9}'
+clear
+ls -l | tail -n+2 | awk '{print $5 " " $9}'
+ls -l | tail -n+2 | awk '{print $5 ":" $9}'
+ls -l | tail -n+2 | awk '{print $5 " " $9}'
+ls -l | tail -n+2 | awk '{printf"%6d %10s\n",$5,$9}'
+ls -l | tail -n+2 | awk '{printf"%-6d %-10s\n",$5,$9}'
+ls -l | tail -n+2 | awk '{printf"%6d %-10s\n",$5,$9}'
+clear
+cat countries.txt | cut -d " " -f 2
+cat countries.txt | awk 'NR>1 {print $2}'
+clear
+awk 'NR>1 {print $2}' countries.txt 
+awk '' countries.txt 
+clear
+awk 'NR>1 && $1=="Europe" {print $2}' countries.txt 
+awk 'NR>1 {c[$1]++} END {for (k in c) print k,c}' countries.txt 
+awk 'NR>1 {c[$1]++} END {for (k in c) print k,c[k]}' countries.txt 
+clear
+sort animals.txt 
+sort animals.txt | uniq
+clear
+sort animals.txt | tr 'A-Z' 'a-z' 
+sort animals.txt | tr 'A-Z' 'a-z' | uniq
+sort animals.txt | tr 'A-Z' 'a-z' | uniq -c
+clear
+sort animals.txt | tr 'A-Z' 'a-z' 
+sort animals.txt | tr 'A-Z' 'a-z' | uniq
+clear
+sort animals.txt | tr 'A-Z' 'a-z' | uniq
+sort animals.txt | tr 'A-Z' 'a-z' | uniq | tr -d 'aeiou'
+clear
+cat animals.txt 
+cat animals.txt | sort
+clear
+cat animals.txt | sort
+cat animals.txt | sort | split -l 5 segment_
+cat animals.txt | sort > sorted.txt
+cclear
+clear
+split -l 5 animals.txt segment_
+ls
+cat segment_aa
+cat segment_ac
+clear
+ls
+paste segment_aa segment_ab
+paste segment_aa segment_ab segment_ac
+paste segment_aa segment_ab segment_ac segment_ad segment_ae segment_af
+paste -d "-" segment_aa segment_ab segment_ac segment_ad segment_ae segment_af
+lsckear
+clear
+ls
+rm seg*
+ls
+rm sorted.txt 
+ls
+clear
+pr countries.txt 
+pr -h "Country Report"  countries.txt 
+pr -t countries.txt 
+awk '{print}' countries.txt 
+cat countries.txt 
+clear
+nano process.sh
+mv process.sh foreach.sh
+clear
+nano factorial.sh
+nano evensum.sh
+nano dryspell.sh
+nano switch.sh
+history
+history > commands.txt
