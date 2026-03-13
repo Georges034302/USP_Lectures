@@ -1,439 +1,1004 @@
-
-# Week 6 --- Unix Filesystem Internals
+# Week 6 — Unix Filesystem Internals
 
 ## Table of Contents
+1. [Filesystem Internal Structure](#1-filesystem-internal-structure)  
+   1.1 [Partition Layout](#11-partition-layout)  
+   1.2 [Boot Block](#12-boot-block)  
+   1.3 [Superblock](#13-superblock)  
+   1.4 [Inode Table](#14-inode-table)  
+   1.5 [Data Blocks](#15-data-blocks)  
+2. [Inodes and File Metadata](#2-inodes-and-file-metadata)  
+   2.1 [What an Inode Represents](#21-what-an-inode-represents)  
+   2.2 [What an Inode Stores](#22-what-an-inode-stores)  
+   2.3 [What an Inode Does Not Store](#23-what-an-inode-does-not-store)  
+   2.4 [Viewing Inodes with `ls -i` and `stat`](#24-viewing-inodes-with-ls--i-and-stat)  
+3. [Block Addressing and File Size](#3-block-addressing-and-file-size)  
+   3.1 [Direct Pointers](#31-direct-pointers)  
+   3.2 [Singly Indirect Pointer](#32-singly-indirect-pointer)  
+   3.3 [Doubly Indirect Pointer](#33-doubly-indirect-pointer)  
+   3.4 [Triply Indirect Pointer](#34-triply-indirect-pointer)  
+   3.5 [Worked Size Calculations](#35-worked-size-calculations)  
+4. [Directories and Path Resolution](#4-directories-and-path-resolution)  
+   4.1 [Directories as Filename-to-Inode Maps](#41-directories-as-filename-to-inode-maps)  
+   4.2 [How Path Resolution Works](#42-how-path-resolution-works)  
+   4.3 [Practical Inspection Examples](#43-practical-inspection-examples)  
+5. [Hard Links and Directory Link Counts](#5-hard-links-and-directory-link-counts)  
+   5.1 [Hard Links](#51-hard-links)  
+   5.2 [Practical Hard Link Demonstration](#52-practical-hard-link-demonstration)  
+   5.3 [Removing Links and File Deletion](#53-removing-links-and-file-deletion)  
+   5.4 [Directory Link Counts](#54-directory-link-counts)  
 
-1.  [Filesystem Internal Structure](#1-filesystem-internal-structure)
-2.  [Inodes and File Metadata](#2-inodes-and-file-metadata)
-3.  [Block Addressing and File Size](#3-block-addressing-and-file-size)
-4.  [Directories and Path
-    Resolution](#4-directories-and-path-resolution)
-5.  [Hard Links and Directory Link Counts](#5-hard-links-and-directory-link-counts)
-
-------------------------------------------------------------------------
+---
 
 # 1. Filesystem Internal Structure
 
 ## Definition
 
-A **Unix filesystem** stores data inside a partition using a structured
-layout that allows the operating system to locate files, manage
-metadata, and allocate storage efficiently.
+A **Unix filesystem** is the internal on-disk structure used to store files, store metadata, allocate blocks, and retrieve file contents from a partition.
 
-Inside a partition, the filesystem is organized into several major
-components.
+A filesystem is not just a collection of filenames. It is a set of coordinated structures that let the kernel answer questions such as:
 
-## Filesystem Layout
+- Where is the file’s metadata?
+- Which blocks contain the file’s contents?
+- Which blocks are free?
+- Which inode belongs to a given filename?
+- Is the filesystem in a valid state?
 
-    +----------------------+
-    | Boot Block           |
-    | (used if bootable)   |
-    +----------------------+
-    | Superblock           |
-    | filesystem metadata  |
-    +----------------------+
-    | Inode Table (i-list) |
-    | metadata for files   |
-    +----------------------+
-    | Data Blocks          |
-    | actual file content  |
-    +----------------------+
+The classic teaching model used in Unix systems programming divides a filesystem partition into four major areas:
 
-### Components
+- boot block
+- superblock
+- inode table
+- data blocks
 
-**Boot Block**\
-Contains boot loader information if the partition is bootable.
+## 1.1 Partition Layout
 
-**Superblock**\
-Stores filesystem-wide information such as:
+A simplified conceptual layout is:
 
--   filesystem size
--   block size
--   number of inodes
--   free block information
+```text
++------------------------------------------------------+
+| Boot Block                                           |
+| Boot code if this partition is bootable              |
++------------------------------------------------------+
+| Superblock                                           |
+| Global metadata about the whole filesystem           |
++------------------------------------------------------+
+| Inode Table (i-list)                                 |
+| Array of inodes describing files and directories     |
++------------------------------------------------------+
+| Data Blocks                                          |
+| File contents, directory contents, pointer blocks    |
++------------------------------------------------------+
+```
 
-**Inode Table (i-list)**\
-Array containing metadata entries for every file and directory.
+Flow of lookup at a high level:
 
-**Data Blocks**\
-Blocks used to store the actual contents of files.
+```text
+filename
+   ↓
+directory entry
+   ↓
+inode number
+   ↓
+inode
+   ↓
+data block addresses
+   ↓
+file contents
+```
 
-### Block
+That sequence is the core idea behind the Unix filesystem.
 
-A **block** is the smallest allocation unit on disk.
+## 1.2 Boot Block
 
-Typical block sizes:
+The **boot block** is relevant only if the partition can be used to boot the system.
 
-    512 bytes
-    1024 bytes
-    4096 bytes
-    8192 bytes
+Purpose:
 
-Blocks are used to store:
+- stores boot loader code
+- participates in system startup
+- is usually ignored for ordinary data partitions
 
--   file contents
--   directory entries
--   pointer structures
+In many practical situations in this subject, you do not interact with the boot block directly. It is part of the filesystem layout, but not part of normal daily file operations.
 
-------------------------------------------------------------------------
+## 1.3 Superblock
+
+The **superblock** stores global metadata about the filesystem as a whole.
+
+Typical information includes:
+
+- total filesystem size
+- block size
+- inode count
+- free block count
+- free inode count
+- filesystem status information
+
+Conceptual diagram:
+
+```text
++----------------------------------+
+| SUPERBLOCK                       |
++----------------------------------+
+| filesystem size                  |
+| block size                       |
+| number of inodes                 |
+| number of free blocks            |
+| number of free inodes            |
+| state / consistency information  |
++----------------------------------+
+```
+
+The superblock is critical because the kernel needs it to interpret the filesystem correctly. If the superblock is corrupted, the filesystem may not mount or may require repair.
+
+## 1.4 Inode Table
+
+The **inode table** is an array of inode structures.
+
+Each inode corresponds to exactly one filesystem object, such as:
+
+- regular file
+- directory
+- symbolic link
+- device file
+- pipe
+- socket
+
+Conceptually:
+
+```text
+inode table
++----------+
+| inode 1  |
++----------+
+| inode 2  |
++----------+
+| inode 3  |
++----------+
+| inode 4  |
++----------+
+      ...
+```
+
+Important principle:
+
+An inode identifies the file object itself, not the filename.
+
+## 1.5 Data Blocks
+
+**Data blocks** are the storage units used to hold actual content.
+
+Depending on context, a data block may contain:
+
+- regular file contents
+- directory entries
+- indirect pointer arrays
+
+Typical block sizes used in teaching examples include:
+
+```text
+512 B
+1 KB
+4 KB
+8 KB
+```
+
+The filesystem allocates blocks as files grow, and the inode stores pointers to those blocks.
+
+---
 
 # 2. Inodes and File Metadata
 
 ## Definition
 
-An **inode (index node)** is the data structure that stores **metadata
-about a file**.
+An **inode** is the metadata structure that describes a filesystem object.
 
-Every file and directory in a Unix filesystem has exactly one inode.
+Every regular file and every directory has an inode. The inode contains the information the kernel needs to manage that object.
 
-Important:\
-The **inode does not store the filename**.
+## 2.1 What an Inode Represents
 
-The filename exists only inside a directory entry.
+The inode represents the file object itself.
 
-## Information Stored in an Inode
+A useful mental model is:
 
-Typical inode fields include:
+```text
+directory entry
+   ├── filename
+   └── inode number
+             ↓
+           inode
+             ↓
+        file metadata
+        block pointers
+             ↓
+         file contents
+```
 
-1.  file type
-2.  link count
-3.  owner user ID
-4.  group ID
-5.  access permissions
-6.  timestamps
-7.  file size
-8.  pointers to data blocks
+The filename gets you to the inode number.  
+The inode number gets you to the inode.  
+The inode gets you to the data blocks.
 
-### Inode Architecture
+## 2.2 What an Inode Stores
 
-    +---------------------+
-    | inode               |
-    +---------------------+
-    | file type           |
-    | link count          |
-    | user ID             |
-    | group ID            |
-    | permissions         |
-    | timestamps          |
-    | file size           |
-    | block pointers      |
-    +---------------------+
+A typical inode stores:
 
-## Viewing Inode Numbers
+1. file type  
+2. link count  
+3. owner user ID  
+4. group ID  
+5. permissions  
+6. timestamps  
+7. file size  
+8. pointers to data blocks  
 
-Command:
+Conceptual structure:
 
-``` bash
+```text
++-------------------------------+
+| inode                         |
++-------------------------------+
+| file type                     |
+| link count                    |
+| owner UID                     |
+| group GID                     |
+| permissions                   |
+| timestamps                    |
+| file size                     |
+| block pointers                |
++-------------------------------+
+```
+
+### File type
+
+The inode identifies what kind of object this is:
+
+- regular file
+- directory
+- symbolic link
+- device file
+- pipe
+- socket
+
+### Link count
+
+The link count tells how many directory entries refer to this inode.
+
+### Owner, group, permissions
+
+These fields support access control.
+
+### Timestamps
+
+These record important file times, such as last access and last modification.
+
+### File size
+
+This records the logical size of the file in bytes.
+
+### Block pointers
+
+These point to the blocks containing the file’s data, or to pointer blocks used to reach those data blocks.
+
+## 2.3 What an Inode Does Not Store
+
+The inode does **not** store the filename.
+
+That is one of the most important Unix filesystem facts.
+
+The filename is stored in the **directory**, not in the inode.
+
+Conceptually:
+
+```text
+directory
++------------------------------+
+| filename        inode number |
++------------------------------+
+| report.txt      672283       |
+| notes.txt       672258       |
++------------------------------+
+```
+
+That is why multiple filenames can refer to the same inode: hard links.
+
+## 2.4 Viewing Inodes with `ls -i` and `stat`
+
+### `ls -i`
+
+Use `ls -i` to display inode numbers.
+
+```bash
 ls -i
-# display inode numbers
+# show inode numbers with filenames
 ```
 
 Example:
 
-``` bash
+```bash
 ls -i
-# sample output
-672258 food1.txt
+672258 notes.txt
 672283 report.txt
-672253 notes.txt
+672253 data.csv
 ```
 
-Explanation:
+Interpretation:
 
-    inode number   filename
-
-To inspect inode metadata:
-
-``` bash
-stat food1.txt
-# show detailed inode metadata
+```text
+672258 → inode for notes.txt
+672283 → inode for report.txt
+672253 → inode for data.csv
 ```
 
-Example output (simplified):
+### `stat`
 
-    File: food1.txt
-    Size: 120
-    Links: 1
-    Access: rw-r--r--
-    Uid: student
-    Gid: student
+Use `stat` to inspect file metadata associated with the inode.
 
-------------------------------------------------------------------------
+```bash
+stat report.txt
+# display file metadata
+```
+
+Typical output includes fields such as:
+
+```text
+File: report.txt
+Size: 1024
+Blocks: 8
+IO Block: 4096
+regular file
+Device: ...
+Inode: 672283
+Links: 1
+Access: (0644/-rw-r--r--)
+Uid: ...
+Gid: ...
+Access: ...
+Modify: ...
+Change: ...
+```
+
+Practical reading of that output:
+
+- `Inode` identifies the inode number
+- `Links` shows the hard link count
+- `Size` shows the file length in bytes
+- `Access` shows permissions
+
+Practical example:
+
+```bash
+touch demo.txt
+# create an empty file
+
+ls -i demo.txt
+# view its inode number
+
+stat demo.txt
+# inspect the inode-related metadata
+```
+
+---
 
 # 3. Block Addressing and File Size
 
 ## Definition
 
-The inode stores **pointers to disk blocks** where the file data is
-stored.
+The inode stores pointers that allow the filesystem to locate the blocks containing the file’s data.
 
-Unix filesystems typically use **15 block pointers**.
+To support both small and very large files efficiently, a traditional Unix teaching model uses:
 
-### Pointer Structure
+- 12 direct pointers
+- 1 singly indirect pointer
+- 1 doubly indirect pointer
+- 1 triply indirect pointer
 
-    +------------------------+
-    | inode                  |
-    +------------------------+
-    | 12 direct pointers     |
-    | 1 singly indirect      |
-    | 1 doubly indirect      |
-    | 1 triply indirect      |
-    +------------------------+
+Conceptual layout:
 
-## Direct Pointers
+```text
++------------------------------------+
+| inode                              |
++------------------------------------+
+| 12 direct pointers                 |
+| 1 singly indirect pointer          |
+| 1 doubly indirect pointer          |
+| 1 triply indirect pointer          |
++------------------------------------+
+```
 
-The first **12 pointers** point directly to file blocks.
+## 3.1 Direct Pointers
 
-    inode
-     ├─ block1
-     ├─ block2
-     ├─ block3
-     ...
-     └─ block12
+The first 12 pointers are **direct pointers**.
 
-### Example
+Each one points directly to a data block.
+
+```text
+inode
+ ├── direct ptr 1  ──→ data block
+ ├── direct ptr 2  ──→ data block
+ ├── direct ptr 3  ──→ data block
+ ├── ...
+ └── direct ptr 12 ──→ data block
+```
+
+Why direct pointers matter:
+
+- fast access for small files
+- no extra pointer blocks needed
+- efficient for common files such as configuration files and small directories
+
+Example:
+
+If block size = 4 KB, then maximum size using only direct pointers is:
+
+```text
+12 × 4 KB = 48 KB
+```
+
+## 3.2 Singly Indirect Pointer
+
+The 13th pointer is the **singly indirect pointer**.
+
+It does not point directly to file data.  
+It points to a block that contains many block addresses.
+
+```text
+inode
+   └── singly indirect ptr
+            ↓
+      +-------------------+
+      | ptr | ptr | ptr   |
+      | ptr | ptr | ptr   |
+      +-------------------+
+         ↓     ↓     ↓
+       data  data  data blocks
+```
+
+Worked example:
 
 Assume:
 
-    block size = 4 KB
-    direct pointers = 12
+- block size = 4 KB
+- pointer size = 4 bytes
 
-Maximum size supported by direct pointers:
+Pointers that fit in one block:
 
-    12 × 4 KB = 48 KB
+```text
+4096 / 4 = 1024 pointers
+```
 
-This is efficient for small files.
+Maximum size reachable through the singly indirect pointer:
 
-------------------------------------------------------------------------
+```text
+1024 × 4 KB = 4 MB
+```
 
-## Singly Indirect Pointer
+## 3.3 Doubly Indirect Pointer
 
-The 13th pointer refers to a block containing **addresses of file
-blocks**.
+The 14th pointer is the **doubly indirect pointer**.
 
-    inode
-      └─ indirect block
-           ├─ block1
-           ├─ block2
-           ├─ block3
-           ...
+It points to a block of pointers, each of which points to another pointer block, which then points to data blocks.
 
-### Example Calculation
+```text
+inode
+   └── doubly indirect ptr
+            ↓
+      +-------------------+
+      | ptr | ptr | ptr   |
+      +-------------------+
+         ↓     ↓     ↓
+   +---------+  +---------+
+   | ptr...  |  | ptr...  |
+   +---------+  +---------+
+      ↓             ↓
+   data blocks   data blocks
+```
+
+Worked example:
+
+Using:
+
+- block size = 4 KB
+- pointer size = 4 bytes
+- 1024 pointers per block
+
+Maximum size reachable:
+
+```text
+1024 × 1024 × 4 KB = 4 GB
+```
+
+## 3.4 Triply Indirect Pointer
+
+The 15th pointer is the **triply indirect pointer**.
+
+It adds one more level.
+
+```text
+inode
+   └── triply indirect ptr
+            ↓
+      top-level pointer block
+            ↓
+      second-level pointer blocks
+            ↓
+      third-level pointer blocks
+            ↓
+           data blocks
+```
+
+Worked example:
+
+Using the same assumptions:
+
+- 1024 pointers per block
+- 4 KB data block size
+
+Maximum size reachable:
+
+```text
+1024 × 1024 × 1024 × 4 KB = 4 TB
+```
+
+## 3.5 Worked Size Calculations
+
+### Example 1: direct pointers only
 
 Assume:
 
-    block size = 4 KB
-    pointer size = 4 bytes
+- block size = 512 B
 
-Pointers per block:
+Maximum file size from direct pointers:
 
-    4096 / 4 = 1024 pointers
+```text
+12 × 512 B = 6144 B = 6 KB
+```
 
-Maximum file size from singly indirect pointer:
+### Example 2: doubly indirect pointer
 
-    1024 × 4 KB = 4 MB
+Assume:
 
-------------------------------------------------------------------------
+- block size = 8 KB
+- pointer size = 4 B
 
-## Doubly Indirect Pointer
+Pointers per pointer block:
 
-The 14th pointer references a block containing pointers to **other
-pointer blocks**.
+```text
+8192 / 4 = 2048
+```
 
-    inode
-      └─ double indirect block
-           ├─ pointer block
-           │    ├─ block
-           │    ├─ block
-           │    └─ block
-           └─ pointer block
+Maximum size from doubly indirect pointer:
 
-Example size:
+```text
+2048 × 2048 × 8 KB = 32 GB
+```
 
-    1024 × 1024 × 4 KB ≈ 4 GB
+### Why this design makes sense
 
-------------------------------------------------------------------------
+This structure is efficient because:
 
-## Triply Indirect Pointer
+- small files are handled quickly through direct pointers
+- large files are still supported through indirect levels
+- the common case stays fast
 
-The 15th pointer adds a third level of indirection.
-
-    inode
-     └─ triple indirect block
-          └─ double indirect block
-               └─ pointer blocks
-                    └─ data blocks
-
-Example maximum size:
-
-    1024 × 1024 × 1024 × 4 KB ≈ 4 TB
-
-The triply indirect pointer dominates the total maximum file size.
-
-------------------------------------------------------------------------
+---
 
 # 4. Directories and Path Resolution
 
 ## Definition
 
-A **directory** is a file that stores mappings between filenames and
-inode numbers.
+A **directory** is a special file whose content is a list of mappings from filenames to inode numbers.
 
-Directory entries contain pairs:
+A directory entry conceptually looks like:
 
-    filename → inode number
+```text
+filename → inode number
+```
 
-Example directory content:
+## 4.1 Directories as Filename-to-Inode Maps
 
-    food1.txt      8235
-    report.txt     8229
-    notes.txt      8269
+Example conceptual directory content:
 
-## Directory Lookup Process
+```text
++----------------------------------+
+| filename          inode number   |
++----------------------------------+
+| notes.txt         672258         |
+| report.txt        672283         |
+| data.csv          672253         |
++----------------------------------+
+```
 
-When accessing a file using an absolute path:
+This means the directory does not store the full metadata for those files.  
+It stores the names and the inode numbers that let the kernel find the actual inode structures.
 
-    /home/student/docs/file.txt
+Practical consequence:
 
-The system resolves the path step by step.
+To open `report.txt`, the system first searches the directory for the entry `report.txt`, obtains its inode number, loads that inode, and then follows its block pointers.
 
-### Path Resolution Flow
+## 4.2 How Path Resolution Works
 
-    /
-     ↓
-    home
-     ↓
-    student
-     ↓
-    docs
-     ↓
-    file.txt
+When the user accesses a pathname such as:
 
-Each step requires reading the directory to find the inode number of the
-next component.
+```text
+/home/student/projects/report.txt
+```
 
-Example:
+the kernel resolves it one component at a time.
 
-    directory entry
-    filename → inode number
+Step-by-step flow:
 
-Then:
+```text
+/
+ ↓
+home
+ ↓
+student
+ ↓
+projects
+ ↓
+report.txt
+```
 
-    inode → data blocks
+Detailed lookup model:
 
-------------------------------------------------------------------------
+```text
+start at /
+   ↓
+read root directory
+   ↓
+find inode for "home"
+   ↓
+read /home directory
+   ↓
+find inode for "student"
+   ↓
+read /home/student directory
+   ↓
+find inode for "projects"
+   ↓
+read /home/student/projects directory
+   ↓
+find inode for "report.txt"
+   ↓
+load inode for report.txt
+   ↓
+follow block pointers to file data
+```
+
+This is why path resolution depends on directories being readable and valid.
+
+### Why absolute paths require multiple lookups
+
+An absolute path is not resolved all at once.  
+Each path component must be found in the directory before it.
+
+For:
+
+```text
+/home/student/projects/report.txt
+```
+
+the kernel must resolve:
+
+1. `/`
+2. `home`
+3. `student`
+4. `projects`
+5. `report.txt`
+
+That is a chain of directory-based lookups.
+
+## 4.3 Practical Inspection Examples
+
+### Example 1: inspect inode and directory behavior
+
+```bash
+mkdir demo_dir
+# create a directory
+
+touch demo_dir/file1.txt
+# create a file inside it
+
+ls -li demo_dir
+# show inode numbers for entries inside the directory
+```
+
+Possible interpretation:
+
+- the directory contains filename-to-inode mappings
+- `file1.txt` has its own inode
+- the directory itself also has an inode
+
+### Example 2: inspect the directory inode itself
+
+```bash
+ls -ldi demo_dir
+# show inode information for the directory itself
+```
+
+Explanation:
+
+- `-d` tells `ls` to list the directory entry itself
+- `-i` prints the inode number
+- without `-d`, `ls` lists the directory contents instead
+
+### Example 3: compare file and directory metadata
+
+```bash
+stat demo_dir
+# inspect metadata for the directory inode
+
+stat demo_dir/file1.txt
+# inspect metadata for the file inode
+```
+
+That comparison helps students see that both directories and regular files have inodes.
+
+---
 
 # 5. Hard Links and Directory Link Counts
 
 ## Definition
 
-A **hard link** is an additional filename that references the same
-inode.
+A **hard link** is an additional directory entry that refers to the same inode.
 
-Multiple filenames can therefore refer to the same underlying file.
+That means two or more filenames can refer to the same file object.
 
-### Architecture
+## 5.1 Hard Links
 
-    directory A
-       |
-       ├── file1.txt ──┐
-                       │
-    directory B        │
-       │               │
-       └── file2.txt ──┘
-              ↓
-            same inode
-              ↓
-            data blocks
+Conceptual model:
 
-Both filenames refer to the **same inode and data blocks**.
+```text
+directory A
+   └── report.txt
+            ↓
+         inode 672283
+            ↓
+         data blocks
 
-## Creating a Hard Link
-
-``` bash
-ln file1.txt file2.txt
-# create second name pointing to same inode
+directory B
+   └── archive.txt
+            ↓
+         inode 672283
+            ↓
+         same data blocks
 ```
 
-Check using:
+Key fact:
 
-``` bash
-ls -l
+If two names have the same inode number, they are hard links to the same file.
+
+This is not the same as copying a file.  
+A copy creates a new inode and new data blocks.  
+A hard link creates a new directory entry pointing to the existing inode.
+
+## 5.2 Practical Hard Link Demonstration
+
+### Step 1: create a file
+
+```bash
+echo "Unix Systems Programming" > original.txt
+# create a file with content
 ```
 
-Example output:
+### Step 2: inspect its inode and link count
 
-    -rw-r--r-- 2 student staff 120 file1.txt
-    -rw-r--r-- 2 student staff 120 file2.txt
-
-Explanation:
-
-    2 = number of hard links to the inode
-
-## Behavior Example
-
-Modify the file through one name:
-
-``` bash
-echo "extra data" >> file1.txt
-# append text to file1
+```bash
+ls -li original.txt
+# show inode number and link count
 ```
 
-Now read using the second name:
+Example style of output:
 
-``` bash
-cat file2.txt
-# displays same content because both names reference same inode
+```text
+672300 -rw-r--r-- 1 student staff 25 original.txt
 ```
 
-## Removing Links
+Interpretation:
 
-Removing one name only removes that directory entry.
+- inode = 672300
+- link count = 1
 
-``` bash
-rm file1.txt
-# removes one link
+### Step 3: create a hard link
+
+```bash
+ln original.txt alias.txt
+# create a second filename pointing to the same inode
 ```
 
-The file still exists because `file2.txt` still references the inode.
+### Step 4: inspect both names
 
-The inode and data blocks are removed only when:
+```bash
+ls -li original.txt alias.txt
+# both names should show the same inode number
+```
 
-    link count = 0
+Expected pattern:
 
-------------------------------------------------------------------------
+```text
+672300 -rw-r--r-- 2 student staff 25 original.txt
+672300 -rw-r--r-- 2 student staff 25 alias.txt
+```
 
-## Directory Link Counts
+Interpretation:
 
-Directories contain automatic entries:
+- same inode number
+- link count now 2
+- both names refer to the same file
 
-    .
-    ..
+### Step 5: modify one name and read through the other
+
+```bash
+echo "More content" >> original.txt
+# append using first name
+
+cat alias.txt
+# read through second name
+```
+
+Why this works:
+
+Both filenames refer to the same inode, therefore the same file contents.
+
+### Step 6: compare with copying
+
+```bash
+cp original.txt copy.txt
+# create an independent copy
+
+ls -li original.txt alias.txt copy.txt
+# compare inode numbers
+```
+
+Expected interpretation:
+
+- `original.txt` and `alias.txt` share one inode
+- `copy.txt` has a different inode
+
+That is the difference between linking and copying.
+
+## 5.3 Removing Links and File Deletion
+
+If you remove one filename:
+
+```bash
+rm original.txt
+# remove one directory entry
+```
+
+the file is not necessarily deleted.
+
+If `alias.txt` still exists, then:
+
+- the inode still exists
+- the data blocks still exist
+- the link count decreases by one
+
+Practical check:
+
+```bash
+ls -li alias.txt
+# file still exists because one link remains
+```
+
+Only when the hard link count reaches zero can the filesystem reclaim the inode and its data blocks.
+
+Conceptual flow:
+
+```text
+2 links
+   ↓ rm one name
+1 link
+   ↓ rm last name
+0 links
+   ↓
+inode and data blocks can be reclaimed
+```
+
+## 5.4 Directory Link Counts
+
+Directories have link counts too.
+
+Every directory contains special entries:
+
+```text
+.
+..
+```
 
 Meaning:
 
-    .   current directory
-    ..  parent directory
+- `.` refers to the directory itself
+- `..` refers to the parent directory
 
-These entries affect the directory's link count.
+### Minimum directory links
 
-Example:
+A directory normally has at least:
 
-``` bash
-ls -l
+- one link from its name in the parent directory
+- one link from `.` inside itself
+
+That is why an empty directory typically shows link count 2.
+
+### Subdirectories increase parent link count
+
+Each subdirectory contains a `..` entry that points back to its parent.
+
+Therefore, each subdirectory increases the parent directory’s link count by one.
+
+Conceptual example:
+
+```text
+parent/
+ ├── .
+ ├── child1/
+ │    └── ..
+ └── child2/
+      └── ..
 ```
 
-Output example:
+For the parent directory, link count reflects:
 
-    drwxr-xr-x 2 student staff 4096 docs
+- its name in its parent directory
+- its own `.`
+- one additional reference from each child directory via `..`
 
-The value **2** represents:
+### Practical example
 
-    docs directory entry
-    .
+```bash
+mkdir parent
+# create parent directory
 
-Each subdirectory adds an additional `..` reference.
+ls -ld parent
+# inspect initial link count
+```
 
-------------------------------------------------------------------------
+Typical interpretation for an empty directory:
+
+```text
+drwxr-xr-x 2 student staff ... parent
+```
+
+Now create a subdirectory:
+
+```bash
+mkdir parent/child
+# create one subdirectory
+```
+
+Inspect again:
+
+```bash
+ls -ld parent
+# parent link count should increase
+```
+
+Typical interpretation:
+
+```text
+drwxr-xr-x 3 student staff ... parent
+```
+
+Why 3:
+
+```text
+1 → parent entry in its own parent directory
+1 → .
+1 → child/.. pointing back to parent
+```
+
+Practical check of the child directory:
+
+```bash
+ls -ld parent/child
+# inspect child directory link count
+```
+
+The child itself usually starts with link count 2 because it has:
+
+- its name in `parent`
+- its own `.` entry
+
+---
 
 **End of Week 6**
